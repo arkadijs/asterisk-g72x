@@ -1,0 +1,142 @@
+--- formats/format_g723.c~	2010-06-03 20:57:54.000000000 +0300
++++ formats/format_g723.c	2010-06-03 21:46:27.000000000 +0300
+@@ -32,52 +32,30 @@
+ #include "asterisk/mod_format.h"
+ #include "asterisk/module.h"
+ 
+-#define G723_MAX_SIZE 1024
++#define BUF_SIZE        24      /* one G723.1 6.3kbps frame */
++#define G723_SAMPLES   240
+ 
+ static struct ast_frame *g723_read(struct ast_filestream *s, int *whennext)
+ {
+-	unsigned short size;
+ 	int res;
+-	int delay;
+-	/* Read the delay for the next packet, and schedule again if necessary */
+-	/* XXX is this ignored ? */
+-	if (fread(&delay, 1, 4, s->f) == 4) 
+-		delay = ntohl(delay);
+-	else
+-		delay = -1;
+-	if (fread(&size, 1, 2, s->f) != 2) {
+-		/* Out of data, or the file is no longer valid.  In any case
+-		   go ahead and stop the stream */
+-		return NULL;
+-	}
+-	/* Looks like we have a frame to read from here */
+-	size = ntohs(size);
+-	if (size > G723_MAX_SIZE) {
+-		ast_log(LOG_WARNING, "Size %d is invalid\n", size);
+-		/* The file is apparently no longer any good, as we
+-		   shouldn't ever get frames even close to this 
+-		   size.  */
+-		return NULL;
+-	}
+ 	/* Read the data into the buffer */
+ 	s->fr.frametype = AST_FRAME_VOICE;
+ 	s->fr.subclass = AST_FORMAT_G723_1;
+ 	s->fr.mallocd = 0;
+-	AST_FRAME_SET_BUFFER(&s->fr, s->buf, AST_FRIENDLY_OFFSET, size);
+-	if ((res = fread(s->fr.data.ptr, 1, s->fr.datalen, s->f)) != size) {
+-		ast_log(LOG_WARNING, "Short read (%d of %d bytes) (%s)!\n", res, size, strerror(errno));
++	s->fr.samples = G723_SAMPLES;
++	AST_FRAME_SET_BUFFER(&s->fr, s->buf, AST_FRIENDLY_OFFSET, BUF_SIZE);
++	if ((res = fread(s->fr.data.ptr, 1, s->fr.datalen, s->f)) != s->fr.datalen) {
++		if (res != 0 || !feof(s->f))
++			ast_log(LOG_WARNING, "Short read (%d of %d bytes) (%s)!\n", res, s->fr.datalen, strerror(errno));
+ 		return NULL;
+ 	}
+-	*whennext = s->fr.samples = 240;
++	*whennext = s->fr.samples;
+ 	return &s->fr;
+ }
+ 
+ static int g723_write(struct ast_filestream *s, struct ast_frame *f)
+ {
+-	uint32_t delay;
+-	uint16_t size;
+ 	int res;
+-	/* XXX there used to be a check s->fr means a read stream */
+ 	if (f->frametype != AST_FRAME_VOICE) {
+ 		ast_log(LOG_WARNING, "Asked to write non-voice frame!\n");
+ 		return -1;
+@@ -86,20 +64,10 @@
+ 		ast_log(LOG_WARNING, "Asked to write non-g723 frame!\n");
+ 		return -1;
+ 	}
+-	delay = 0;
+ 	if (f->datalen <= 0) {
+ 		ast_log(LOG_WARNING, "Short frame ignored (%d bytes long?)\n", f->datalen);
+ 		return 0;
+ 	}
+-	if ((res = fwrite(&delay, 1, 4, s->f)) != 4) {
+-		ast_log(LOG_WARNING, "Unable to write delay: res=%d (%s)\n", res, strerror(errno));
+-		return -1;
+-	}
+-	size = htons(f->datalen);
+-	if ((res = fwrite(&size, 1, 2, s->f)) != 2) {
+-		ast_log(LOG_WARNING, "Unable to write size: res=%d (%s)\n", res, strerror(errno));
+-		return -1;
+-	}
+ 	if ((res = fwrite(f->data.ptr, 1, f->datalen, s->f)) != f->datalen) {
+ 		ast_log(LOG_WARNING, "Unable to write frame: res=%d (%s)\n", res, strerror(errno));
+ 		return -1;
+@@ -109,7 +77,28 @@
+ 
+ static int g723_seek(struct ast_filestream *fs, off_t sample_offset, int whence)
+ {
+-	return -1;
++        long bytes;
++        off_t min,cur,max,offset=0;
++        min = 0;
++        cur = ftello(fs->f);
++        fseeko(fs->f, 0, SEEK_END);
++        max = ftello(fs->f);
++        
++        bytes = BUF_SIZE * (sample_offset / G723_SAMPLES);
++        if (whence == SEEK_SET)
++                offset = bytes;
++        else if (whence == SEEK_CUR || whence == SEEK_FORCECUR)
++                offset = cur + bytes;
++        else if (whence == SEEK_END)
++                offset = max - bytes;
++        if (whence != SEEK_FORCECUR) {
++                offset = (offset > max)?max:offset;
++        }
++        /* protect against seeking beyond begining. */
++        offset = (offset < min)?min:offset;
++        if (fseeko(fs->f, offset, SEEK_SET) < 0)
++                return -1;
++        return 0;
+ }
+ 
+ static int g723_trunc(struct ast_filestream *fs)
+@@ -122,7 +111,8 @@
+ 
+ static off_t g723_tell(struct ast_filestream *fs)
+ {
+-	return -1;
++        off_t offset = ftello(fs->f);
++        return (offset/BUF_SIZE)*G723_SAMPLES;
+ }
+ 
+ static const struct ast_format g723_1_f = {
+@@ -134,7 +124,7 @@
+ 	.trunc = g723_trunc,
+ 	.tell =	g723_tell,
+ 	.read =	g723_read,
+-	.buf_size = G723_MAX_SIZE + AST_FRIENDLY_OFFSET,
++	.buf_size = BUF_SIZE + AST_FRIENDLY_OFFSET,
+ };
+ 
+ static int load_module(void)
+@@ -149,7 +139,7 @@
+ 	return ast_format_unregister(g723_1_f.name);
+ }	
+ 
+-AST_MODULE_INFO(ASTERISK_GPL_KEY, AST_MODFLAG_LOAD_ORDER, "G.723.1 Simple Timestamp File Format",
++AST_MODULE_INFO(ASTERISK_GPL_KEY, AST_MODFLAG_LOAD_ORDER, "Raw G.723.1 data",
+ 	.load = load_module,
+ 	.unload = unload_module,
+ 	.load_pri = 10,
