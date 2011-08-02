@@ -307,7 +307,11 @@ static struct ast_frame *lintog72x_sample(void)
 {
     static struct ast_frame f;
     f.frametype = AST_FRAME_VOICE;
+#if G72X_ASTERISK < 100
     f.FRAME_SUBCLASS = AST_FORMAT_SLINEAR;
+#else
+    ast_format_set(&f.subclass.format, AST_FORMAT_SLINEAR, 0);
+#endif
     f.datalen = sizeof(slin_g72x_ex);
     f.samples = sizeof(slin_g72x_ex)/2;
     f.mallocd = 0;
@@ -321,7 +325,11 @@ static struct ast_frame *g72xtolin_sample(void)
 {
     static struct ast_frame f;
     f.frametype = AST_FRAME_VOICE;
+#if G72X_ASTERISK < 100
     f.FRAME_SUBCLASS = G72X_AST_FORMAT;
+#else
+    ast_format_set(&f.subclass.format, G72X_AST_FORMAT, 0);
+#endif
     f.datalen = sizeof(g72x_slin_ex);
     f.samples = G72X_SAMPLES;
     f.mallocd = 0;
@@ -594,7 +602,7 @@ static struct ast_translator g72xtolin = {
 #if G72X_CALLWEAVER
     .src_format = G72X_AST_FORMAT,
     .dst_format = AST_FORMAT_SLINEAR,
-#else
+#elif G72X_ASTERISK < 100
     .srcfmt = G72X_AST_FORMAT,
     .dstfmt = AST_FORMAT_SLINEAR,
 #endif
@@ -617,7 +625,7 @@ static struct ast_translator lintog72x = {
 #if G72X_CALLWEAVER
     .src_format = AST_FORMAT_SLINEAR,
     .dst_format = G72X_AST_FORMAT,
-#else
+#elif G72X_ASTERISK < 100
     .srcfmt = AST_FORMAT_SLINEAR,
     .dstfmt = G72X_AST_FORMAT,
 #endif
@@ -746,6 +754,14 @@ static int load_module(void)
 {
     int res;
 
+#if G72X_ASTERISK >= 100
+    ast_format_set(&lintog72x.src_format, AST_FORMAT_SLINEAR, 0);
+    ast_format_set(&lintog72x.dst_format, G72X_AST_FORMAT, 0);
+
+    ast_format_set(&g72xtolin.src_format, G72X_AST_FORMAT, 0);
+    ast_format_set(&g72xtolin.dst_format, AST_FORMAT_SLINEAR, 0);
+#endif
+    
 #if !G72X_ITU && IPPCORE_STATIC_INIT
     ippStaticInit();
 #endif

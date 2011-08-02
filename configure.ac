@@ -1,5 +1,5 @@
 # targeting native build, cross-compile is surely broken
-AC_INIT(codec_g72x, 1.1-beta1, http://groups.google.com/group/asterisk-g729)
+AC_INIT(codec_g72x, 1.1-beta3, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
@@ -50,9 +50,12 @@ AC_ARG_WITH(asterisk16,
 AC_ARG_WITH(asterisk18,
     AS_HELP_STRING([--with-asterisk18], [Build for Asterisk 1.8 (the default)]),
     [ASTERISK_VERSION="18"])
-AC_ARG_WITH(asterisk17,
-    AS_HELP_STRING([--with-asterisk19], [Build for Asterisk SVN TRUNK]),
-    [ASTERISK_VERSION="19"])
+AC_ARG_WITH(asterisk100,
+    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10.0]),
+    [ASTERISK_VERSION="100"])
+AC_ARG_WITH(asterisk101,
+    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
+    [ASTERISK_VERSION="101"])
 AC_ARG_WITH(callweaver,
     AS_HELP_STRING([--with-callweaver=PATH], [Build for CallWeaver (not supported yet)]),
     [CALLWEAVER_CFLAGS="-DG72X_CALLWEAVER -I\"$withval\""])

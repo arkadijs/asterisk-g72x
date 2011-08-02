@@ -1,11 +1,15 @@
 # choose Asterisk or Callweaver version
+# Asterisk 10.0
+#inc=/home/arkadi/opt/asterisk-10.0/include
+#def=-DG72X_ASTERISK=100
+
 # Asterisk 1.8
-#inc=/home/arkadi/opt/asterisk-1.8.0/include
-#def=-DG72X_ASTERISK=18
+inc=/home/arkadi/opt/asterisk-1.8.0/include
+def=-DG72X_ASTERISK=18
 
 # Asterisk 1.6
-inc=/home/arkadi/opt/asterisk-1.6.2/include
-def=-DG72X_ASTERISK=16
+#inc=/home/arkadi/opt/asterisk-1.6.2/include
+#def=-DG72X_ASTERISK=16
 
 # Asterisk 1.4
 #inc=/home/arkadi/opt/asterisk-1.4/include
