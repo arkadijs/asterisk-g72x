@@ -29,6 +29,7 @@
 #define __VADG729FP_H__
 
 #include <ipps.h>
+#include <ippsr.h>
 #include "owng729fp.h"
 
 struct _G729FPVADmemory_Obj{

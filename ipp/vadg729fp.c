@@ -175,7 +175,10 @@ void VoiceActivityDetect_G729_32f(Ipp32f ReflectCoeff, Ipp32f *pLSF, Ipp32f *pAu
     ippsDotProd_32f(pTmp, pTmp, LPC_ORDER, &fSpectralDistortion);
 
     /* compute # zero crossing */
-    ippsZeroCrossing_32f(&pSrc[ZC_START_INDEX], ZC_END_INDEX+1-ZC_START_INDEX, &zeroNum, ippZCR);
+    // IPP 5.3 has no ippsZeroCrossing()
+    // http://software.intel.com/sites/products/documentation/hpc/ipp/ipps/ipps_ch5/functn_ZeroCrossing.html
+    // ippsZeroCrossing_32f(&pSrc[ZC_START_INDEX], ZC_END_INDEX+1-ZC_START_INDEX, &zeroNum, ippZCR);
+    ippsSignChangeRate_32f(&pSrc[ZC_START_INDEX], ZC_END_INDEX+1-ZC_START_INDEX, &zeroNum);
     lNumZeroCrossing = zeroNum/80;
 
     /* Initialize and update min energies */
