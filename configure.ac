@@ -209,24 +209,22 @@ if test -z "$G72X_ITU"; then
         AC_MSG_ERROR([compiler does not support -march=native, use --enable-pentium/etc. to choose the core, or set CFLAGS])
     fi
 
+    case "$build_cpu" in
+        i?86)
+            ipp_arch=ia32;
+            ;;
+        x86_64|amd64)
+            ipp_arch=em64t;
+            ;;
+    esac
+
     if test -z "$ipp_root"; then
         AC_MSG_CHECKING([location of IPP libraries])
         with_ipp_to_override=" (use --with-ipp=/path/to/ipp to override)"
-        case "$build_cpu" in
-            i?86)
-                ipp_arch=ia32;
-                ;;
-            x86_64|amd64)
-                ipp_arch=em64t;
-                ;;
-        esac;
 
         # 7.0
         ipp_dir="/opt/intel/composerxe-2011/ipp"
         if test -d "$ipp_dir/"; then
-            if test $ipp_arch = em64t; then
-                ipp_arch=intel64
-            fi
             ipp_root="$ipp_dir"
             ipp_ver=7.0
         fi
@@ -255,13 +253,17 @@ if test -z "$G72X_ITU"; then
     fi
 
     if test -z "$ipp_root"; then
-        AC_MSG_ERROR([IPP not found - use --with-ip=/path/to/ipp to specify])
+        AC_MSG_ERROR([IPP not found - use --with-ipp=/path/to/ipp to specify])
     fi
 
     if test -z "$ipp_ver"; then
         AC_MSG_CHECKING([version of IPP libraries])
         ipp_ver=$(grep IPP_VERSION_STR "$ipp_root/include/ippversion.h"|cut -d\  -f3|cut -c2-4)
         AC_MSG_RESULT([$ipp_ver])
+    fi
+
+    if test "$ipp_ver" = "7.0" -a "$ipp_arch" = "em64t"; then
+        ipp_arch=intel64
     fi
 
     case $ipp_core in

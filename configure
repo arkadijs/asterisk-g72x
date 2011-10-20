@@ -11916,25 +11916,23 @@ $as_echo "$cpu_features" >&6; }
         as_fn_error $? "compiler does not support -march=native, use --enable-pentium/etc. to choose the core, or set CFLAGS" "$LINENO" 5
     fi
 
+    case "$build_cpu" in
+        i?86)
+            ipp_arch=ia32;
+            ;;
+        x86_64|amd64)
+            ipp_arch=em64t;
+            ;;
+    esac
+
     if test -z "$ipp_root"; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking location of IPP libraries" >&5
 $as_echo_n "checking location of IPP libraries... " >&6; }
         with_ipp_to_override=" (use --with-ipp=/path/to/ipp to override)"
-        case "$build_cpu" in
-            i?86)
-                ipp_arch=ia32;
-                ;;
-            x86_64|amd64)
-                ipp_arch=em64t;
-                ;;
-        esac;
 
         # 7.0
         ipp_dir="/opt/intel/composerxe-2011/ipp"
         if test -d "$ipp_dir/"; then
-            if test $ipp_arch = em64t; then
-                ipp_arch=intel64
-            fi
             ipp_root="$ipp_dir"
             ipp_ver=7.0
         fi
@@ -11964,7 +11962,7 @@ $as_echo "$ipp_root" >&6; }
     fi
 
     if test -z "$ipp_root"; then
-        as_fn_error $? "IPP not found - use --with-ip=/path/to/ipp to specify" "$LINENO" 5
+        as_fn_error $? "IPP not found - use --with-ipp=/path/to/ipp to specify" "$LINENO" 5
     fi
 
     if test -z "$ipp_ver"; then
@@ -11973,6 +11971,10 @@ $as_echo_n "checking version of IPP libraries... " >&6; }
         ipp_ver=$(grep IPP_VERSION_STR "$ipp_root/include/ippversion.h"|cut -d\  -f3|cut -c2-4)
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ipp_ver" >&5
 $as_echo "$ipp_ver" >&6; }
+    fi
+
+    if test "$ipp_ver" = "7.0" -a "$ipp_arch" = "em64t"; then
+        ipp_arch=intel64
     fi
 
     case $ipp_core in
