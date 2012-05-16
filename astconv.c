@@ -107,7 +107,7 @@ int main(int argc, char **argv)
         short slin[frame_size/2];
         int padded = 0, frame_started = 0;
 
-        f.subclass = AST_FORMAT_SLINEAR;
+        f.subclass.codec = AST_FORMAT_SLINEAR;
         f.datalen = sizeof(slin);
         f.samples = sizeof(slin)/2;
         f.data.ptr = slin;
