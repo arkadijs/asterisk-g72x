@@ -42,9 +42,10 @@ statistics about received frames sizes. This can aid in debugging audio problems
 You need to bump Asterisk verbosity level to 3 to see the numbers.
 
 astconv is audio format conversion utility similar to Asterisk "file convert"
-command. It could be built by supplied build-astconv.sh script against Asterisk
-1.6.1 or later. It uses codec_*.so modules directly to perform the conversion.
-You need a _matching_ Asterisk codec module, which means 1.6.1 or later.
+command. Build with supplied build-astconv.sh script against Asterisk 1.8
+or later. astconv uses codec_*.so modules directly to perform the conversion.
+You need codec module that was compiled against same Asterisk version the
+astconv was built against.
 The translation result could be used to:
 1. confirm the codec is working properly;
 2. prepare voicemail prompts,
