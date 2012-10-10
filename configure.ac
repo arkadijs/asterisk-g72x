@@ -1,5 +1,5 @@
 # targeting native build, cross-compile is surely broken
-AC_INIT(codec_g72x, 1.1-beta3, http://groups.google.com/group/asterisk-g729)
+AC_INIT(codec_g72x, 1.1, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
@@ -38,9 +38,9 @@ ASTERISK_VERSION="18";
 AC_ARG_WITH(asterisk-includes,
     AS_HELP_STRING([--with-asterisk-includes=PATH], [Path to Asterisk includes (defaults to PREFIX/include, so try --prefix first)]),
     [ASTERISK_CFLAGS="-I\"$withval\""])
-AC_ARG_WITH(asterisk12,
-    AS_HELP_STRING([--with-asterisk12], [Build for Asterisk 1.2 (not supported yet)]),
-    [ASTERISK_VERSION="12"])
+#AC_ARG_WITH(asterisk12,
+#    AS_HELP_STRING([--with-asterisk12], [Build for Asterisk 1.2 (not supported yet)]),
+#    [ASTERISK_VERSION="12"])
 AC_ARG_WITH(asterisk14,
     AS_HELP_STRING([--with-asterisk14], [Build for Asterisk 1.4]),
     [ASTERISK_VERSION="14"])
@@ -48,17 +48,17 @@ AC_ARG_WITH(asterisk16,
     AS_HELP_STRING([--with-asterisk16], [Build for Asterisk 1.6]),
     [ASTERISK_VERSION="16"])
 AC_ARG_WITH(asterisk18,
-    AS_HELP_STRING([--with-asterisk18], [Build for Asterisk 1.8 (the default)]),
+    AS_HELP_STRING([--with-asterisk18], [Build for Asterisk 1.8]),
     [ASTERISK_VERSION="18"])
 AC_ARG_WITH(asterisk100,
-    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10.0]),
+    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10 & 11 (the default)]),
     [ASTERISK_VERSION="100"])
-AC_ARG_WITH(asterisk101,
-    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
-    [ASTERISK_VERSION="101"])
-AC_ARG_WITH(callweaver,
-    AS_HELP_STRING([--with-callweaver=PATH], [Build for CallWeaver (not supported yet)]),
-    [CALLWEAVER_CFLAGS="-DG72X_CALLWEAVER -I\"$withval\""])
+#AC_ARG_WITH(asterisk101,
+#    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
+#    [ASTERISK_VERSION="101"])
+#AC_ARG_WITH(callweaver,
+#    AS_HELP_STRING([--with-callweaver=PATH], [Build for CallWeaver (not supported yet)]),
+#    [CALLWEAVER_CFLAGS="-DG72X_CALLWEAVER -I\"$withval\""])
 
 AC_ARG_WITH(ipp,
     AS_HELP_STRING([--with-ipp=PATH], [Path to Intel IPP (/path/to/ipp)]),
@@ -73,6 +73,7 @@ AC_ARG_WITH(itu,
     [G72X_ITU="-DG72X_ITU"])
 
 # http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-understanding-cpu-optimized-code-used-in-intel-ipp/
+# http://software.intel.com/sites/products/documentation/doclib/ipp_sa/71/ipp_userguide_lnx/GUID-BABCDBB5-E674-4ECF-AE3A-4945274FDA80.htm
 # IPP cores are:
 # 32-bit
 # px - pentium mmx
@@ -83,6 +84,7 @@ AC_ARG_WITH(itu,
 # p8 - core2 penryn sse4.1, core i7 nehalem sse4.2 & westmere aes-ni mini-dispatcher
 # s8 - atom ssse3
 # g9 - sandy bridge avx
+# h9 - avx2
 # 64-bit
 # mx - older amd64 w/o sse3?
 # m7 - pentium4 prescott sse3 em64t
@@ -90,6 +92,7 @@ AC_ARG_WITH(itu,
 # y8 - core2 penryn sse4.1, core i7 nehalem sse4.2 & westmere aes-ni mini-dispatcher
 # n8 - atom
 # e9 - sandy bridge avx
+# i9 - avx2
 # i7 - itanium
 
 #              sse3   ssse3  sse4.1
@@ -223,10 +226,10 @@ if test -z "$G72X_ITU"; then
         with_ipp_to_override=" (use --with-ipp=/path/to/ipp to override)"
 
         # 7.0
-        ipp_dir="/opt/intel/composerxe-2011/ipp"
+        ipp_dir="/opt/intel/composerxe/ipp"
         if test -d "$ipp_dir/"; then
             ipp_root="$ipp_dir"
-            ipp_ver=7.0
+            ipp_ver=7.x
         fi
 
         if test -z "$ipp_root"; then
@@ -262,7 +265,7 @@ if test -z "$G72X_ITU"; then
         AC_MSG_RESULT([$ipp_ver])
     fi
 
-    if test "$ipp_ver" = "7.0" -a "$ipp_arch" = "em64t"; then
+    if test "$ipp_ver" = "7.x" -a "$ipp_arch" = "em64t"; then
         ipp_arch=intel64
     fi
 
@@ -285,7 +288,7 @@ if test -z "$G72X_ITU"; then
             ;;
         # 32-bit SSE3 removed in 7.0
         t7)
-            if test "$ipp_ver" = "7.0"; then
+            if test "$ipp_ver" = "7.x"; then
                 ipp_core=w7;
                 case "$build_cpu" in
                     i?86)
@@ -302,8 +305,8 @@ if test -z "$G72X_ITU"; then
             ;;
         # missing staticlib/ include
         g9)
-            if test "$ipp_ver" != "7.0"; then
-                AC_MSG_ERROR([Use IPP 7.0 for Sandy Bridge AVX])
+            if test "$ipp_ver" != "7.x"; then
+                AC_MSG_ERROR([Use IPP 7.0+ for Sandy Bridge AVX])
             fi
             case "$build_cpu" in
                 i?86)
@@ -320,7 +323,7 @@ if test -z "$G72X_ITU"; then
     esac
 
     IPP_CFLAGS="-I\"$ipp_root/include\" $ipp_cdefs";
-    if test "$ipp_ver" = "7.0"; then
+    if test "$ipp_ver" = "7.x"; then
         IPP_LDFLAGS="-L\"$ipp_root/lib/$ipp_arch\"";
     else
         IPP_LDFLAGS="-L\"$ipp_root/lib\"";
@@ -328,7 +331,7 @@ if test -z "$G72X_ITU"; then
 
     case "$build_cpu" in
         i?86)
-            if test "$ipp_ver" = "7.0"; then
+            if test "$ipp_ver" = "7.x"; then
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/$ipp_arch/staticlib/ipp_$ipp_core.h\""
                 IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
              else
@@ -341,7 +344,7 @@ if test -z "$G72X_ITU"; then
             if test "$ipp_ver" = "5.3"; then
                 IPP_CFLAGS="$IPP_CFLAGS -DIPPCORE_STATIC_INIT"
                 IPP_LIBS="-lippscemergedem64t -lippsremergedem64t -lippsemergedem64t -lippscmergedem64t -lippsrmergedem64t -lippsmergedem64t -lippcoreem64t"
-            elif test "$ipp_ver" = "7.0"; then
+            elif test "$ipp_ver" = "7.x"; then
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/$ipp_arch/staticlib/ipp_$ipp_core64.h\""
                 IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
             else
