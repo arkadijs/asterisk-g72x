@@ -2,15 +2,15 @@ G.729 and G.723.1 codecs for Asterisk open source PBX.
 http://asterisk.hosting.lv/
 http://groups.google.com/group/asterisk-g729
 
-Asterisk 1.4, 1.6, 1.8, and TRUNK are supported. Use binaries from the website
-for Asterisk 1.2 and Callweaver.
+Asterisk 1.4, 1.6, 1.8, 10, and 11 are supported. For Asterisk 1.2 and Callweaver
+use the pre-built binaries from the website.
 
 To compile the codecs it is recommended to install Intel IPP libraries for
 production-level performance.
 Otherwise a slower ANSI C codecs implementation provided by ITU-T will be used.
-Tested against IPP 5.3, 6.0, 6.1, and 7.0.
+Tested against IPP 5.3, 6.0, 6.1, 7.0, and 7.1.
 Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU.
-Download from
+Download IPP from
 http://software.intel.com/en-us/articles/non-commercial-software-download/
 AMD processors works with IPP without problems.
 
@@ -19,7 +19,7 @@ out of ITU-T code if you build it with GCC 4.5 or Intel CC with LTO/IPO enabled.
 Still, even with ICC, it is 10x slower than IPP - 30ms vs 3ms of processor time
 to encode one second of G.729 audio on modern hardware. G.723 is around 100ms.
 GCC with LTO is 2x slower than ICC.
-With ITU-T code, Core2 class processor is recommended.
+For ITU-T code, a Core2 class processor is recommended.
 
 There are two ways to build the codecs:
 1. Use ./configure. Check the available options with ./configure --help.
