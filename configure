@@ -11480,7 +11480,7 @@ if test "${prefix}" != "/usr"; then
 fi
 #echo new prefix: "${prefix}"
 
-ASTERISK_VERSION="18";
+ASTERISK_VERSION="100";
 
 
 # Check whether --with-asterisk-includes was given.
@@ -12036,11 +12036,23 @@ $as_echo_n "checking location of IPP libraries... " >&6; }
 
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ipp_root" >&5
 $as_echo "$ipp_root" >&6; }
+
+        if test -z "$ipp_root"; then
+            as_fn_error $? "IPP not found - use --with-ipp=/path/to/ipp to specify" "$LINENO" 5
+        fi
+    else
+        vh="$ipp_root"/include/ippversion.h
+        if test ! -f "$vh"; then
+            as_fn_error $? "IPP not found in \"$ipp_root\"" "$LINENO" 5
+        fi
+        major=$(grep IPP_VERSION_MAJOR "$vh" | cut -d\  -f3)
+        minor=$(grep IPP_VERSION_MINOR "$vh" | cut -d\  -f3)
+        if test $major = 7; then
+           minor=x
+        fi
+        ipp_ver=$major.$minor
     fi
 
-    if test -z "$ipp_root"; then
-        as_fn_error $? "IPP not found - use --with-ipp=/path/to/ipp to specify" "$LINENO" 5
-    fi
 
     if test -z "$ipp_ver"; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking version of IPP libraries" >&5

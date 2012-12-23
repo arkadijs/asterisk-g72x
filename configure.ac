@@ -33,7 +33,7 @@ if test "${prefix}" != "/usr"; then
 fi
 #echo new prefix: "${prefix}"
 
-ASTERISK_VERSION="18";
+ASTERISK_VERSION="100";
 
 AC_ARG_WITH(asterisk-includes,
     AS_HELP_STRING([--with-asterisk-includes=PATH], [Path to Asterisk includes (defaults to PREFIX/include, so try --prefix first)]),
@@ -253,11 +253,23 @@ if test -z "$G72X_ITU"; then
         fi
 
         AC_MSG_RESULT([$ipp_root])
+
+        if test -z "$ipp_root"; then
+            AC_MSG_ERROR([IPP not found - use --with-ipp=/path/to/ipp to specify])
+        fi
+    else
+        vh="$ipp_root"/include/ippversion.h
+        if test ! -f "$vh"; then
+            AC_MSG_ERROR([IPP not found in "$ipp_root"])
+        fi
+        major=$(grep IPP_VERSION_MAJOR "$vh" | cut -d\  -f3)
+        minor=$(grep IPP_VERSION_MINOR "$vh" | cut -d\  -f3)
+        if test $major = 7; then
+           minor=x
+        fi
+        ipp_ver=$major.$minor
     fi
 
-    if test -z "$ipp_root"; then
-        AC_MSG_ERROR([IPP not found - use --with-ipp=/path/to/ipp to specify])
-    fi
 
     if test -z "$ipp_ver"; then
         AC_MSG_CHECKING([version of IPP libraries])
