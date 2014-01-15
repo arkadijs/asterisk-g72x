@@ -11,7 +11,7 @@ Otherwise a slower ANSI C codecs implementation provided by ITU-T will be used.
 Tested against IPP 5.3, 6.0, 6.1, 7.0, and 7.1.
 Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU.
 Download IPP from
-http://software.intel.com/en-us/articles/non-commercial-software-download/
+http://software.intel.com/en-us/non-commercial-software-development
 AMD processors works with IPP without problems.
 
 In case you do not want to install IPP, then you'll get twice better performance
