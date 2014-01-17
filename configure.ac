@@ -1,5 +1,5 @@
 # targeting native build, cross-compile is surely broken
-AC_INIT(codec_g72x, 1.1, http://groups.google.com/group/asterisk-g729)
+AC_INIT(codec_g72x, 1.2, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
@@ -51,7 +51,7 @@ AC_ARG_WITH(asterisk18,
     AS_HELP_STRING([--with-asterisk18], [Build for Asterisk 1.8]),
     [ASTERISK_VERSION="18"])
 AC_ARG_WITH(asterisk100,
-    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10 & 11 (the default)]),
+    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10, 11, 12 (the default)]),
     [ASTERISK_VERSION="100"])
 #AC_ARG_WITH(asterisk101,
 #    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
@@ -92,7 +92,7 @@ AC_ARG_WITH(itu,
 # y8 - core2 penryn sse4.1, core i7 nehalem sse4.2 & westmere aes-ni mini-dispatcher
 # n8 - atom
 # e9 - sandy bridge avx
-# i9 - avx2
+# l9 - avx2
 # i7 - itanium
 
 #              sse3   ssse3  sse4.1
@@ -225,11 +225,10 @@ if test -z "$G72X_ITU"; then
         AC_MSG_CHECKING([location of IPP libraries])
         with_ipp_to_override=" (use --with-ipp=/path/to/ipp to override)"
 
-        # 7.0
+        # 7.0+
         ipp_dir="/opt/intel/composerxe/ipp"
         if test -d "$ipp_dir/"; then
             ipp_root="$ipp_dir"
-            ipp_ver=7.x
         fi
 
         if test -z "$ipp_root"; then
@@ -257,27 +256,20 @@ if test -z "$G72X_ITU"; then
         if test -z "$ipp_root"; then
             AC_MSG_ERROR([IPP not found - use --with-ipp=/path/to/ipp to specify])
         fi
-    else
-        vh="$ipp_root"/include/ippversion.h
-        if test ! -f "$vh"; then
-            AC_MSG_ERROR([IPP not found in "$ipp_root"])
-        fi
-        major=$(grep IPP_VERSION_MAJOR "$vh" | cut -d\  -f3)
-        minor=$(grep IPP_VERSION_MINOR "$vh" | cut -d\  -f3)
-        if test $major = 7; then
-           minor=x
-        fi
-        ipp_ver=$major.$minor
     fi
 
-
-    if test -z "$ipp_ver"; then
-        AC_MSG_CHECKING([version of IPP libraries])
-        ipp_ver=$(grep IPP_VERSION_STR "$ipp_root/include/ippversion.h"|cut -d\  -f3|cut -c2-4)
-        AC_MSG_RESULT([$ipp_ver])
+    ipp_vh="$ipp_root"/include/ippversion.h
+    if test ! -f "$ipp_vh"; then
+        AC_MSG_ERROR([IPP not found in $ipp_root])
     fi
 
-    if test "$ipp_ver" = "7.x" -a "$ipp_arch" = "em64t"; then
+    AC_MSG_CHECKING([version of IPP libraries])
+    ipp_major=$(grep IPP_VERSION_MAJOR "$ipp_vh" | cut -d\  -f3)
+    ipp_minor=$(grep IPP_VERSION_MINOR "$ipp_vh" | cut -d\  -f3)
+    ipp_ver=$ipp_major.$ipp_minor
+    AC_MSG_RESULT([$ipp_ver])
+
+    if test $ipp_major -ge 7 -a "$ipp_arch" = "em64t"; then
         ipp_arch=intel64
     fi
 
@@ -300,7 +292,7 @@ if test -z "$G72X_ITU"; then
             ;;
         # 32-bit SSE3 removed in 7.0
         t7)
-            if test "$ipp_ver" = "7.x"; then
+            if test $ipp_major -ge 7; then
                 ipp_core=w7;
                 case "$build_cpu" in
                     i?86)
@@ -309,15 +301,9 @@ if test -z "$G72X_ITU"; then
                 esac;
             fi
             ;;
-        # px/mx status in 7.0 is unclear
-        px)
-            if test "$ipp_ver" != "5.3" -a "$ipp_ver" != "6.0" -a "$ipp_ver" != "6.1"; then
-                AC_MSG_ERROR([Use IPP 6.1 for Pentium/Pentium2, Geode, and Opteron w/o SSE3])
-            fi
-            ;;
         # check missing staticlib/ include
         g9)
-            if test "$ipp_ver" != "7.x"; then
+            if test $ipp_major -lt 7; then
                 AC_MSG_ERROR([Use IPP 7.0+ for Sandy Bridge AVX])
             fi
             case "$build_cpu" in
@@ -335,7 +321,10 @@ if test -z "$G72X_ITU"; then
     esac
 
     IPP_CFLAGS="-I\"$ipp_root/include\" $ipp_cdefs";
-    if test "$ipp_ver" = "7.x"; then
+    if test $ipp_major -eq 8; then
+        IPP_LIBS="$ipp_root/lib/$ipp_arch/libippsc.a $ipp_root/lib/$ipp_arch/libipps.a $ipp_root/lib/$ipp_arch/libippcore.a $ipp_root/../compiler/lib/$ipp_arch/libirc.a $ipp_root/../compiler/lib/$ipp_arch/libsvml.a"
+    elif test $ipp_major -eq 7; then
+        IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
         IPP_LDFLAGS="-L\"$ipp_root/lib/$ipp_arch\"";
     else
         IPP_LDFLAGS="-L\"$ipp_root/lib\"";
@@ -343,23 +332,21 @@ if test -z "$G72X_ITU"; then
 
     case "$build_cpu" in
         i?86)
-            if test "$ipp_ver" = "7.x"; then
+            if test $ipp_major -ge 7; then
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/$ipp_arch/staticlib/ipp_$ipp_core.h\""
-                IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
-             else
+            else
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/staticlib/ipp_$ipp_core.h\""
                 IPP_LIBS="-lippscmerged -lippsrmerged -lippsmerged -lippcore"
-             fi
-           ;;
+            fi
+            ;;
         x86_64|amd64)
             # IPP 5.3 does not have tools/staticlib helpers
             if test "$ipp_ver" = "5.3"; then
                 IPP_CFLAGS="$IPP_CFLAGS -DIPPCORE_STATIC_INIT"
                 IPP_LIBS="-lippscemergedem64t -lippsremergedem64t -lippsemergedem64t -lippscmergedem64t -lippsrmergedem64t -lippsmergedem64t -lippcoreem64t"
-            elif test "$ipp_ver" = "7.x"; then
+            elif test $ipp_major -ge 7; then
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/$ipp_arch/staticlib/ipp_$ipp_core64.h\""
-                IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
-            else
+            else # 6.x
                 IPP_CFLAGS="$IPP_CFLAGS -include \"$ipp_root/tools/staticlib/ipp_$ipp_core64.h\""
                 IPP_LIBS="-lippscmergedem64t -lippsrmergedem64t -lippsmergedem64t -lippcoreem64t"
             fi

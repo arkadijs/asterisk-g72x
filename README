@@ -2,13 +2,13 @@ G.729 and G.723.1 codecs for Asterisk open source PBX.
 http://asterisk.hosting.lv/
 http://groups.google.com/group/asterisk-g729
 
-Asterisk 1.4, 1.6, 1.8, 10, and 11 are supported. For Asterisk 1.2 and Callweaver
-use the pre-built binaries from the website.
+Asterisk 1.4, 1.6, 1.8, 10, 11, and 12 are supported. For Asterisk 1.2 and
+Callweaver use the pre-built binaries from the website.
 
 To compile the codecs it is recommended to install Intel IPP libraries for
 production-level performance.
 Otherwise a slower ANSI C codecs implementation provided by ITU-T will be used.
-Tested against IPP 5.3, 6.0, 6.1, 7.0, and 7.1.
+Tested against IPP 5.3, 6.0, 6.1, 7.0, 7.1, 8.0.
 Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU.
 Download IPP from
 http://software.intel.com/en-us/non-commercial-software-development
@@ -22,8 +22,9 @@ GCC with LTO is 2x slower than ICC.
 For ITU-T code, a Core2 class processor is recommended.
 
 There are two ways to build the codecs:
-1. Use ./configure. Check the available options with ./configure --help.
-   Specify --prefix in case Asterisk is installed in non-standard location.
+1. Use ./autogen.sh to generate autotools files, then ./configure. Check available
+   options with ./configure --help. Specify --prefix in case Asterisk is installed
+   in non-standard location.
    ICC support is work in progress, please set CFLAGS for now.
 2. Edit build-ipp.sh (IPP) or build-itu.sh (ITU-T) to select Asterisk version,
    compiler, and preferred optimization parameters.
