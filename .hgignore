@@ -1,0 +1,14 @@
+syntax: glob
+
+Makefile.in
+aclocal.m4
+compile
+config.guess
+config.h.in*
+config.sub
+configure
+depcomp
+install-sh
+ltmain.sh
+m4/l*m4
+missing

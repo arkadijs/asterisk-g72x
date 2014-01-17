@@ -315,7 +315,7 @@ if test -z "$G72X_ITU"; then
                 AC_MSG_ERROR([Use IPP 6.1 for Pentium/Pentium2, Geode, and Opteron w/o SSE3])
             fi
             ;;
-        # missing staticlib/ include
+        # check missing staticlib/ include
         g9)
             if test "$ipp_ver" != "7.x"; then
                 AC_MSG_ERROR([Use IPP 7.0+ for Sandy Bridge AVX])
