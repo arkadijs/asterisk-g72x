@@ -1,5 +1,5 @@
 # targeting native build, cross-compile is surely broken
-AC_INIT(codec_g72x, 1.2, http://groups.google.com/group/asterisk-g729)
+AC_INIT(codec_g72x, 1.3, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
@@ -23,6 +23,14 @@ case "${host_os}" in
     *)
         ac_default_prefix=/usr
         ;;
+esac
+
+# tested on raspberry Pi, may be not valid for other ARM devices
+case "${host}" in
+  armv6l-*-linux-gnueabihf*)
+    cflags="-mcpu=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp -O3 -Wall"
+    march="armv6zk"
+    ;;
 esac
 
 if test "${prefix}" = "NONE"; then
@@ -68,9 +76,9 @@ AC_ARG_WITH(g729nofp,
     AS_HELP_STRING([--with-g729nofp], [Use integer (no floating point) version of G.729 IPP codec (marginally faster on AMD Geode CPU)]),
     [G72X_9_NOFP="-DG72X_9_NOFP"])
 
-AC_ARG_WITH(itu,
-    AS_HELP_STRING([--with-itu], [Use ITU implementation - no IPP required, codec is ANSI C]),
-    [G72X_ITU="-DG72X_ITU"])
+AC_ARG_WITH(bcg729,
+    AS_HELP_STRING([--with-bcg729], [Build against Bcg729 library; without G.723.1]),
+    [G72X_BCG729="-DG72X_BCG729"])
 
 # http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-understanding-cpu-optimized-code-used-in-intel-ipp/
 # http://software.intel.com/sites/products/documentation/doclib/ipp_sa/71/ipp_userguide_lnx/GUID-BABCDBB5-E674-4ECF-AE3A-4945274FDA80.htm
@@ -173,7 +181,7 @@ AC_ARG_ENABLE([pentium],
     AS_HELP_STRING([--enable-pentium], [Optimize for Intel Pentium]),
     [march=pentium-mmx; ipp_core=px; ipp_cdefs=-DIPPCORE_NO_SSE; cflags=""])
 
-if test -z "$G72X_ITU"; then
+if test -z "$G72X_BCG729"; then
     if test -z "$ipp_core"; then
         AC_CHECK_FILE([/proc/cpuinfo],
             [cpu_features="`grep -iE ^flags /proc/cpuinfo|cut -f2 -d:|head -1`"],
@@ -353,6 +361,9 @@ if test -z "$G72X_ITU"; then
             ipp_core=$ipp_core64 # for output
             ;;
     esac
+
+else # G72X_BCG729 is defined
+    AC_CHECK_LIB([bcg729], [initBcg729EncoderChannel], [], [AC_MSG_ERROR([unable to find Bcg729 library])])
 fi
 
 if test -z "$saved_cflags"; then
@@ -360,8 +371,8 @@ if test -z "$saved_cflags"; then
     FLTO_LDFLAGS="$fwholeprg"
 fi
 
-AM_CONDITIONAL([ITU_CODE], [test -n "$G72X_ITU"])
-AM_CONDITIONAL([G729_NOFP], [test -n "$G72X_9_NOFP" -a -z "$G72X_ITU"])
+AM_CONDITIONAL([BCG729], [test -n "$G72X_BCG729"])
+AM_CONDITIONAL([G729_NOFP], [test -n "$G72X_9_NOFP" -a -z "$G72X_BCG729"])
 
 AC_SUBST([ASTERISK_ASTERISK_H])
 AC_SUBST([ASTERISK_CFLAGS])
@@ -371,7 +382,7 @@ AC_SUBST([IPP_CFLAGS])
 AC_SUBST([IPP_LDFLAGS])
 AC_SUBST([IPP_LIBS])
 AC_SUBST([FLTO_LDFLAGS])
-AC_SUBST([G72X_ITU])
+AC_SUBST([G72X_BCG729])
 AC_SUBST([G72X_9_NOFP])
 
 AC_OUTPUT([Makefile])
@@ -380,9 +391,9 @@ echo
 echo "Architecture: $build_cpu"
 echo "  CPU -march: $march"
 echo "      CFLAGS: $CFLAGS $IPP_CFLAGS $ASTERISK_CFLAGS"
-echo "     LDFLAGS: $IPP_LDFLAGS $IPP_LIBS $FLTO_LDFLAGS"
-echo " Codecs impl:" $(test -z "$G72X_ITU" && echo IPP || echo ITU) $(test -z "$G729_NOFP_TRUE" && echo "/ G.729 integer codec")
-if test -z "$G72X_ITU"; then
+echo "     LDFLAGS: $FLTO_LDFLAGS" $IPP_LDFLAGS $IPP_LIBS
+echo " Codecs impl:" $(test -z "$G72X_BCG729" && echo IPP || echo Bcg729) $(test -z "$G729_NOFP_TRUE" && echo "/ G.729 integer codec")
+if test -z "$G72X_BCG729"; then
 echo "    IPP path: $ipp_root$with_ipp_to_override"
 echo "    IPP ver.: $ipp_ver"
 echo "    IPP core: $ipp_core$use_ipp53$use_ipp60"

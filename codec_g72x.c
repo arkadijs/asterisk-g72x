@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <time.h>
 
-/* single file implements both G.729 and G.723.1, both IPP and ITU-T based codecs,
-   Asterisk 1.4 to 1.8 */
+/* single file implements both G.729 and G.723.1, both IPP and Bcg729 based codecs,
+   Asterisk 1.4 to 12 */
 /* quite a lot of preprocessor abuse, but still better than maintaining multiple
    similar files */
 
@@ -30,7 +30,7 @@
     #include <asterisk/cli.h>
 
     #if G72X_ASTERISK < 14
-        #error not supported yet
+        #error not supported
     #endif
 
 #elif G72X_CALLWEAVER
@@ -64,7 +64,7 @@
     #error either G72X_ASTERISK or G72X_CALLWEAVER must be defined
 #endif
 
-#if !G72X_ITU
+#if !G72X_BCG729
     #include <ippcore.h>
     #include <ipps.h>
 #endif
@@ -72,13 +72,9 @@
 #if G72X_9
     #define G72X_CODEC "g729"
 
-    #if G72X_ITU
-        #include "typedef.h"
-        #include "basic_op.h"
-        #include "ld8a.h"
-        #include "tab_ld8a.h"
-        #include "util.h"
-        #include "pre_proc.h"
+    #if G72X_BCG729
+        #include "bcg729/decoder.h"
+        #include "bcg729/encoder.h"
 
     #else
         #if !G72X_9_NOFP
@@ -114,16 +110,8 @@
 #elif G72X_3
     #define G72X_CODEC "g723"
 
-    #if G72X_ITU
-        #include "typedef.h"
-        #include "cst_lbc.h"
-        #include "exc_lbc.h"
-        #include "coder.h"
-        #include "decod.h"
-        #include "cod_cng.h"
-        #include "dec_cng.h"
-        #include "vad.h"
-
+    #if G72X_BCG729
+        #error no portable code for G.723.1, ITU-T ref impl is too slow
     #else
         #include "g723api.h"
     #endif
@@ -168,45 +156,21 @@
 #endif
 
 #define AST_MODULE "codec_" G72X_CODEC
-#if !G72X_ITU
+#if !G72X_BCG729
     #define G72X_DESC G72X_CODEC " Coder/Decoder, based on Intel IPP"
 #else
-    #define G72X_DESC G72X_CODEC " Coder/Decoder, based on ITU-T code"
-#endif
-
-/* ITU-T G.723.1 reference implementation operates on global variables */
-/* it was lightly modified to use thread local variables */
-/* G.729 is already modified to externalise coder state, source is ripped from FreeSWITCH */
-#if G72X_ITU && !G72X_9
-    __thread CODSTATDEF *CodStat;
-    __thread DECSTATDEF *DecStat;
-    __thread VADSTATDEF *VadStat;
-    __thread CODCNGDEF  *CodCng;
-    __thread DECCNGDEF  *DecCng;
-    enum Crate WrkRate = Rate63;
-    Flag UseHp = True;
-    Flag UsePf = True;
-    Flag UseVx = False;
-    Flag UsePr = True;
+    #define G72X_DESC G72X_CODEC " Coder/Decoder, based on Bcg729"
 #endif
 
 struct g72x_coder_pvt {
-#if G72X_ITU && !G72X_9
-    CODSTATDEF *CodStat;
-    DECSTATDEF *DecStat;
-    VADSTATDEF *VadStat;
-    CODCNGDEF  *CodCng;
-    DECCNGDEF  *DecCng;
-#else
     void *coder;
-#endif
-#if !G72X_ITU
+#if !G72X_BCG729
     void *scratch_mem;
 #endif
     int16_t buf[BUFFER_SAMPLES]; /* 1 second */
 };
 
-#if !G72X_ITU
+#if !G72X_BCG729
     static int encoder_size;
     static int decoder_size;
     static int coder_size_scratch;
@@ -230,7 +194,7 @@ static int lintog72x_new(struct ast_trans_pvt *pvt)
 {
     struct g72x_coder_pvt *state = pvt->pvt;
 
-#if !G72X_ITU
+#if !G72X_BCG729
     #ifndef IPPCORE_NO_SSE
         ippSetFlushToZero(1, NULL); /* is FZM flag per-thread or not? does it matter at all? */
     #endif
@@ -244,26 +208,7 @@ static int lintog72x_new(struct ast_trans_pvt *pvt)
         apiG723Encoder_Init(state->coder, G723Encode_DefaultMode);
     #endif
 #else
-    #if G72X_9
-        state->coder = Init_Coder_ld8a();
-        Init_Pre_Process((CodState*)state->coder);
-    #else
-        CodStat = state->CodStat = malloc(sizeof(CODSTATDEF));
-        /*if (0) {*/
-            VadStat = state->VadStat = malloc(sizeof(VADSTATDEF));
-            CodCng  = state->CodCng  = malloc(sizeof(CODCNGDEF));
-        /*} else {
-            VadStat = state->VadStat = NULL;
-            CodCng  = state->CodCng  = NULL;
-        }*/
-        DecStat = state->DecStat = NULL;
-        DecCng  = state->DecCng  = NULL;
-        Init_Coder();
-        if (0) {
-            Init_Vad();
-            Init_Cod_Cng();
-        }
-    #endif
+    state->coder = initBcg729EncoderChannel();
 #endif
     return 0;
 }
@@ -272,7 +217,7 @@ static int g72xtolin_new(struct ast_trans_pvt *pvt)
 {
     struct g72x_coder_pvt *state = pvt->pvt;
 
-#if !G72X_ITU
+#if !G72X_BCG729
     #ifndef IPPCORE_NO_SSE
         ippSetFlushToZero(1, NULL);
     #endif
@@ -286,19 +231,7 @@ static int g72xtolin_new(struct ast_trans_pvt *pvt)
         apiG723Decoder_Init(state->coder, G723Decode_DefaultMode);
     #endif
 #else
-    #if G72X_9
-        state->coder = Init_Decod_ld8a();
-        Init_Post_Filter((DecState*)state->coder);
-        Init_Post_Process((DecState*)state->coder);
-    #else
-        DecStat = state->DecStat = malloc(sizeof(DECSTATDEF));
-        DecCng  = state->DecCng  = malloc(sizeof(DECCNGDEF));
-        CodStat = state->CodStat = NULL;
-        VadStat = state->VadStat = NULL;
-        CodCng  = state->CodCng  = NULL;
-        Init_Decod();
-        Init_Dec_Cng();
-    #endif
+    state->coder = initBcg729DecoderChannel();
 #endif
     return 0;
 }
@@ -339,12 +272,10 @@ static struct ast_frame *g72xtolin_sample(void)
     return &f;
 }
 
-#if !G72X_ITU
-    static unsigned char lost_frame[G72X_FRAME_LEN] = { 0 };
-#endif
+static unsigned char lost_frame[G72X_FRAME_LEN] = { 0 };
 
 #if G72X_9
-    #if !G72X_ITU
+    #if !G72X_BCG729
         static int g729_frame_type(int datalen)
         {
             switch (datalen) {
@@ -371,15 +302,17 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
     if (f->datalen == 0) {  /* Native PLC interpolation */
         if (option_verbose > 2)
             ast_verbose(VERBOSE_PREFIX_3 "G.729 PLC\n");
-#if !G72X_ITU
         if (pvt->samples + G729_SAMPLES > BUFFER_SAMPLES) {
             ast_log(LOG_WARNING, "Out of buffer space\n");
             return -1;
         }
+#if !G72X_BCG729
         apiG729Decode(state->coder, (unsigned char *)lost_frame, g729_frame_type(0), dst + pvt->samples);
+#else
+        bcg729Decoder(state->coder, (unsigned char *)lost_frame, 1, dst + pvt->samples);
+#endif
         pvt->samples += G729_SAMPLES;
         pvt->datalen += 2 * G729_SAMPLES; /* 2 bytes/sample */
-#endif
         return 0;
     }
 
@@ -392,30 +325,10 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
             framesize = 2;  /* SID */
         else
             framesize = 10; /* regular 729a frame */
-#if !G72X_ITU
+#if !G72X_BCG729
         apiG729Decode(state->coder, (unsigned char *)f->FRAME_DATA + x, g729_frame_type(framesize), dst + pvt->samples);
-#else
-        {
-        DecState* decoder = (DecState*)state->coder;
-        int i;
-        Word16 *synth;
-        Word16 parm[PRM_SIZE + 1];
-
-        Restore_Params((unsigned char *)f->FRAME_DATA + x, &parm[1]);
-        synth = decoder->synth_buf + M;
-        parm[0] = 1;
-        for (i = 1; i <= PRM_SIZE; ++i) {
-            if (parm[i] != 0) {
-                parm[0] = 0;
-                break;
-            }
-        }
-        parm[4] = Check_Parity_Pitch(parm[3], parm[4]);
-        Decod_ld8a(decoder, parm, synth, decoder->Az_dec, decoder->T2, &decoder->bad_lsf);
-        Post_Filter(decoder, synth, decoder->Az_dec, decoder->T2);
-        Post_Process(decoder, synth, G729_SAMPLES);
-        memcpy(dst + pvt->samples, synth, SLIN_FRAME_LEN);
-        }
+#elif G72X_9
+        bcg729Decoder(state->coder, (unsigned char *)f->FRAME_DATA + x, 0, dst + pvt->samples);
 #endif
         pvt->samples += G729_SAMPLES;
         pvt->datalen += 2*G729_SAMPLES;
@@ -448,7 +361,6 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
     if (f->datalen == 0) {  /* Native PLC interpolation */
         if (option_verbose > 2)
             ast_verbose(VERBOSE_PREFIX_3 "G.723.1 PLC\n");
-#if !G72X_ITU
         if (pvt->samples + G723_SAMPLES > BUFFER_SAMPLES) {
             ast_log(LOG_WARNING, "Out of buffer space\n");
             return -1;
@@ -457,7 +369,6 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
         apiG723Decode(state->coder, (void *)lost_frame, badframe, dst + pvt->samples);
         pvt->samples += G723_SAMPLES;
         pvt->datalen += 2 * G723_SAMPLES; /* 2 bytes/sample */
-#endif
         return 0;
     }
 
@@ -469,16 +380,7 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
         }
         frametype = *((unsigned char *)f->FRAME_DATA + x) & (short)0x0003;
         framesize = g723_frame_length(frametype);
-#if !G72X_ITU
         apiG723Decode(state->coder, (void *)f->FRAME_DATA + x, badframe, dst + pvt->samples);
-#else
-        DecStat = state->DecStat;
-        DecCng  = state->DecCng;
-        CodStat = state->CodStat;
-        VadStat = state->VadStat;
-        CodCng  = state->CodCng;
-        Decod(dst + pvt->samples, (void *)f->FRAME_DATA + x, 0);
-#endif
         pvt->samples += G723_SAMPLES;
         pvt->datalen += 2*G723_SAMPLES;
     }
@@ -496,7 +398,7 @@ static int lintog72x_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
     return 0;
 }
 
-#if G72X_9 && !G72X_ITU
+#if G72X_9 && !G72X_BCG729
     /* length != 10 can't happen but let it be here for reference */
     static int g729_frame_length(int frametype)
     {
@@ -516,7 +418,7 @@ static struct ast_frame *lintog72x_frameout(struct ast_trans_pvt *pvt)
     struct g72x_coder_pvt *state = pvt->pvt;
     int datalen = 0;
     int samples = 0;
-#if G72X_9 && !G72X_ITU
+#if G72X_9 && !G72X_BCG729
     int frametype;
 #endif
 
@@ -524,7 +426,7 @@ static struct ast_frame *lintog72x_frameout(struct ast_trans_pvt *pvt)
     if (pvt->samples < G72X_SAMPLES)
         return NULL;
     while (pvt->samples >= G72X_SAMPLES) {
-#if !G72X_ITU
+#if !G72X_BCG729
     #if G72X_9
         apiG729Encode(state->coder, state->buf + samples, (unsigned char *)(pvt->OUTBUF_G72X) + datalen, G729A_CODEC, &frametype);
         datalen += g729_frame_length(frametype);
@@ -534,28 +436,8 @@ static struct ast_frame *lintog72x_frameout(struct ast_trans_pvt *pvt)
         datalen += (g723_sendrate == G723_RATE_63) ? 24 : 20;
     #endif
 #else
-    #if G72X_9
-        {
-        CodState* coder = (CodState*)state->coder;
-        Word16 parm[PRM_SIZE];
-
-        memcpy(coder->new_speech, state->buf + samples, SLIN_FRAME_LEN);
-        Pre_Process(coder, coder->new_speech, G729_SAMPLES);
-        Coder_ld8a(coder, parm);
-        Store_Params(parm, (unsigned char *)(pvt->OUTBUF_G72X) + datalen);
-        }
+        bcg729Encoder(state->coder, state->buf + samples, (unsigned char *)(pvt->OUTBUF_G72X) + datalen);
         datalen += G729_FRAME_LEN;
-    #else
-        DecStat = state->DecStat;
-        DecCng  = state->DecCng;
-        CodStat = state->CodStat;
-        VadStat = state->VadStat;
-        CodCng  = state->CodCng;
-        if (g723_sendrate == G723_RATE_53)
-            reset_max_time();
-        Coder(state->buf + samples, (void *)(pvt->OUTBUF_G72X + datalen));
-        datalen += (g723_sendrate == G723_RATE_63) ? 24 : 20;
-    #endif
 #endif
         samples += G72X_SAMPLES;
         pvt->samples -= G72X_SAMPLES;
@@ -572,19 +454,11 @@ static void g72x_destroy(struct ast_trans_pvt *pvt)
 {
     int i;
     struct g72x_coder_pvt *state = pvt->pvt;
-#if !G72X_ITU
+#if !G72X_BCG729
     ippsFree(state->coder);
     ippsFree(state->scratch_mem);
 #else
-    #if G72X_9
-        free(state->coder);
-    #else
-        if (state->CodStat != NULL) free(state->CodStat);
-        if (state->VadStat != NULL) free(state->VadStat);
-        if (state->CodCng  != NULL) free(state->CodCng);
-        if (state->DecStat != NULL) free(state->DecStat);
-        if (state->DecCng  != NULL) free(state->DecCng);
-    #endif
+    free(state->coder);
 #endif
     /* output the sizes of frames passed to decoder */
     if (option_verbose > 2 && frame_sizes != NULL) {
@@ -669,9 +543,6 @@ static struct ast_translator lintog72x = {
                     if (option_verbose > 2)
                         ast_verbose(VERBOSE_PREFIX_3 "G.723.1 setting sendrate to %d\n", rate);
                     g723_sendrate = (rate == 63) ? G723_RATE_63 : G723_RATE_53;
-    #if G72X_ITU
-                    WrkRate = (rate == 63) ? Rate63 : Rate53;
-    #endif
                 } else {
                     ast_log(LOG_ERROR, "G.723.1 sendrate must be 53 or 63\n");
                 }
@@ -761,8 +632,8 @@ static int load_module(void)
     ast_format_set(&g72xtolin.src_format, G72X_AST_FORMAT, 0);
     ast_format_set(&g72xtolin.dst_format, AST_FORMAT_SLINEAR, 0);
 #endif
-    
-#if !G72X_ITU && IPPCORE_STATIC_INIT
+
+#if !G72X_BCG729 && IPPCORE_STATIC_INIT
     ippStaticInit();
 #endif
 
@@ -770,7 +641,7 @@ static int load_module(void)
     parse_config();
 #endif
 
-#if !G72X_ITU
+#if !G72X_BCG729
     #if G72X_9
         apiG729Decoder_Alloc(G729A_CODEC, &decoder_size);
         apiG729Encoder_Alloc(G729A_CODEC, &encoder_size);
