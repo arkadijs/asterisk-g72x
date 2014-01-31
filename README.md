@@ -1,9 +1,10 @@
 ### G.729 and G.723.1 codecs for Asterisk open source PBX
 
-http://asterisk.hosting.lv/
-http://groups.google.com/group/asterisk-g729
+[Primary website](http://asterisk.hosting.lv/)
 
-Asterisk 1.4, 1.6, 1.8, 10, 11, and 12 are supported. For Asterisk 1.2 and Callweaver use the pre-built binaries from the website.
+[Asterisk G.729 Google group]
+
+[Asterisk] 1.4, 1.6, 1.8, 10, 11, and 12 are supported. For Asterisk 1.2 and Callweaver use the pre-built binaries from the [website].
 
 To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, you need to download and install [Bcg729] - a slightly slower, C90 implementation. Only G.729 will be available in that case.
 
@@ -32,7 +33,11 @@ The translation result could be used to: (1) confirm the codec is working proper
     ./astconv ./codec_g723.so -e 480 file.slin file.g723
     ./astconv ./codec_g723.so -d 24  file.g723 file.slin
 
-`file.slin` is signed linear 16-bin 8kHz mono audio, you can play it with `aplay -f S16_LE file.slin` and convert to/from other formats with SOX:
+`file.slin` is signed linear 16-bin 8kHz mono audio, you can play it with
+
+    aplay -f S16_LE file.slin
+
+and convert to/from other formats with SOX:
 
     sox input.wav -e signed-integer -b 16 -c 1 -r 8k -t raw output.slin
     sox -t raw -e signed-integer -b 16 -c 1 -r 8k input.slin output.wav
@@ -49,6 +54,7 @@ Before reporting problem with the codecs, please read the website and make sure 
 
 Author: Arkadi.Shishlov at gmail dot com
 
+[Asterisk]: http://www.asterisk.org/
 [website]: http://asterisk.hosting.lv/
 [Intel IPP]: http://software.intel.com/en-us/non-commercial-software-development
 [Bcg729]: http://www.linphone.org/eng/documentation/dev/bcg729.html
