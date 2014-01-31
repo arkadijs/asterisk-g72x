@@ -1,10 +1,10 @@
 ### G.729 and G.723.1 codecs for Asterisk open source PBX
 
-[Primary website](http://asterisk.hosting.lv/) / [Asterisk G.729 Google group]
+[Primary website] / [Google group]
 
 [Asterisk] 1.4, 1.6, 1.8, 10, 11, and 12 are supported. For Asterisk 1.2 and Callweaver use the pre-built binaries from the [website].
 
-To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, you need to download and install [Bcg729] - a slightly slower, C90 implementation. Only G.729 will be available in that case.
+To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, you need to download and install [Bcg729] - a slightly slower implementation written in portable C99. Only G.729 will be available in that case.
 
 The codecs are tested against Bcg729 1.0.0, IPP 5.3, 6.0, 6.1, 7.0, 7.1, 8.0. Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU. AMD processors works with IPP without problems.
 
@@ -24,7 +24,7 @@ There are also two Asterisk CLI commands `g723 debug` and `g729 debug` to print 
 
 `astconv` is audio format conversion utility similar to Asterisk `file convert` command. Build it with supplied `build-astconv.sh` script against Asterisk 1.8 or later. astconv uses codec_*.so modules directly to perform the conversion. You need codec module that was compiled against same Asterisk version the astconv was built against.
 
-The translation result could be used to: (1) confirm the codec is working properly; (2) prepare voice-mail prompts, for example:
+The translation result could be used to: (a) confirm the codec is working properly; (b) prepare voice-mail prompts, for example:
 
     ./astconv ./codec_g729.so -e 160 file.slin file.g729
     ./astconv ./codec_g729.so -d 10  file.g729 file.slin
@@ -48,13 +48,15 @@ Files:
 - g723_slin_ex.h, g729_slin_ex.h, slin_g72x_ex.h - sample speech data;
 - ipp/ files are copied from IPP samples, IPP license apply.
 
-Before reporting problem with the codecs, please read the website and make sure you know what you're doing - compiling the codecs is not a novice task. Asking [Asterisk G.729 Google group] first is also good idea.
+Before reporting problem with the codecs, please read the [website] and make sure you know what you're doing - compiling the codecs is not a novice task. Asking [Asterisk G.729 Google group] first is also good idea.
 
 Author: Arkadi.Shishlov at gmail dot com
 
 [Asterisk]: http://www.asterisk.org/
+[Primary website]: http://asterisk.hosting.lv/
 [website]: http://asterisk.hosting.lv/
 [Intel IPP]: http://software.intel.com/en-us/non-commercial-software-development
 [Bcg729]: http://www.linphone.org/eng/documentation/dev/bcg729.html
 [GNU Autoconf]: https://www.gnu.org/software/autoconf/
 [Asterisk G.729 Google group]: http://groups.google.com/group/asterisk-g729
+[Google group]: http://groups.google.com/group/asterisk-g729
