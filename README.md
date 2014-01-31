@@ -1,8 +1,6 @@
 ### G.729 and G.723.1 codecs for Asterisk open source PBX
 
-[Primary website](http://asterisk.hosting.lv/)
-
-[Asterisk G.729 Google group]
+[Primary website](http://asterisk.hosting.lv/) / [Asterisk G.729 Google group]
 
 [Asterisk] 1.4, 1.6, 1.8, 10, 11, and 12 are supported. For Asterisk 1.2 and Callweaver use the pre-built binaries from the [website].
 
