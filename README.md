@@ -31,11 +31,11 @@ The translation result could be used to: (a) confirm the codec is working proper
     ./astconv ./codec_g723.so -e 480 file.slin file.g723
     ./astconv ./codec_g723.so -d 24  file.g723 file.slin
 
-`file.slin` is signed linear 16-bin 8kHz mono audio, you can play it with
+`file.slin` is signed linear 16-bin 8kHz mono audio, you can play it with alsa-utils:
 
     aplay -f S16_LE file.slin
 
-and convert to/from other formats with SOX:
+and convert between other formats with SOX:
 
     sox input.wav -e signed-integer -b 16 -c 1 -r 8k -t raw output.slin
     sox -t raw -e signed-integer -b 16 -c 1 -r 8k input.slin output.wav
