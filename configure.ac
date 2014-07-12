@@ -330,7 +330,7 @@ if test -z "$G72X_BCG729"; then
 
     IPP_CFLAGS="-I\"$ipp_root/include\" $ipp_cdefs";
     if test $ipp_major -eq 8; then
-        IPP_LIBS="$ipp_root/lib/$ipp_arch/libippsc.a $ipp_root/lib/$ipp_arch/libipps.a $ipp_root/lib/$ipp_arch/libippcore.a $ipp_root/../compiler/lib/$ipp_arch/libirc.a $ipp_root/../compiler/lib/$ipp_arch/libsvml.a"
+        IPP_LIBS="$ipp_root/lib/$ipp_arch/libippsc.a $ipp_root/lib/$ipp_arch/libipps.a $ipp_root/lib/$ipp_arch/libippvm.a $ipp_root/lib/$ipp_arch/libippcore.a $ipp_root/../compiler/lib/$ipp_arch/libirc.a $ipp_root/../compiler/lib/$ipp_arch/libsvml.a"
     elif test $ipp_major -eq 7; then
         IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"
         IPP_LDFLAGS="-L\"$ipp_root/lib/$ipp_arch\"";
