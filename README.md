@@ -6,7 +6,7 @@
 
 To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, you need to download and install [Bcg729] - a slightly slower implementation written in portable C99. Only G.729 will be available in that case.
 
-The codecs are tested against Bcg729 1.0.0, IPP 5.3, 6.0, 6.1, 7.0, 7.1, 8.0. Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU. AMD processors works with IPP without problems.
+The codecs are tested against Bcg729 1.0.0, IPP 5.3, 6.0, 6.1, 7.0, 7.1, 8.0, 8.1. Use IPP 5.3 for Pentium3, and 6.0+ for Atom CPU. AMD processors works with IPP without problems.
 
 Use `./autogen.sh` to generate [GNU Autoconf] files, then `./configure`. Check available options with `./configure --help`. Specify `--prefix` in case Asterisk is installed in non-standard location.
 
