@@ -78,7 +78,7 @@ AC_ARG_WITH(g729nofp,
 
 AC_ARG_WITH(bcg729,
     AS_HELP_STRING([--with-bcg729], [Build against Bcg729 library; without G.723.1]),
-    [G72X_BCG729="-DG72X_BCG729"])
+    [G72X_BCG729="-DG72X_BCG729"; CPPFLAGS="$CPPFLAGS -I/usr/local/include"; LDFLAGS="$LDFLAGS -L/usr/local/lib"])
 
 # http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-understanding-cpu-optimized-code-used-in-intel-ipp/
 # http://software.intel.com/sites/products/documentation/doclib/ipp_sa/71/ipp_userguide_lnx/GUID-BABCDBB5-E674-4ECF-AE3A-4945274FDA80.htm
