@@ -1,5 +1,5 @@
 # targeting native build, cross-compile is surely broken
-AC_INIT(codec_g72x, 1.2, http://groups.google.com/group/asterisk-g729)
+AC_INIT(codec_g72x, 1.3, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
@@ -61,6 +61,9 @@ AC_ARG_WITH(asterisk18,
 AC_ARG_WITH(asterisk100,
     AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10, 11, 12 (the default)]),
     [ASTERISK_VERSION="100"])
+AC_ARG_WITH(asterisk130,
+    AS_HELP_STRING([--with-asterisk130], [Build for Asterisk 13]),
+    [ASTERISK_VERSION="130"])
 #AC_ARG_WITH(asterisk101,
 #    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
 #    [ASTERISK_VERSION="101"])

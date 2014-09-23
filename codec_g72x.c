@@ -103,9 +103,10 @@
     #define G729_SAMPLES    80 /* 10ms at 8000 hz, 160 bytes signed linear */
     #define BUFFER_SAMPLES  8000
 
-    #define G72X_FRAME_LEN  G729_FRAME_LEN
-    #define G72X_SAMPLES    G729_SAMPLES
-    #define G72X_AST_FORMAT AST_FORMAT_G729A
+    #define G72X_FRAME_LEN    G729_FRAME_LEN
+    #define G72X_SAMPLES      G729_SAMPLES
+    #define G72X_AST_FORMAT   AST_FORMAT_G729A
+    #define G72X_AST_FORMAT13 ast_format_g729
 
 #elif G72X_3
     #define G72X_CODEC "g723"
@@ -124,13 +125,13 @@
     #define G723_SAMPLES    240 /* 30ms at 8000 hz, 480 bytes signed linear */
     #define BUFFER_SAMPLES  8000
 
-    #define G72X_FRAME_LEN  G723_FRAME_LEN
-    #define G72X_SAMPLES    G723_SAMPLES
-    #define G72X_AST_FORMAT AST_FORMAT_G723_1
+    #define G72X_FRAME_LEN    G723_FRAME_LEN
+    #define G72X_SAMPLES      G723_SAMPLES
+    #define G72X_AST_FORMAT   AST_FORMAT_G723_1
+    #define G72X_AST_FORMAT13 ast_format_g723
 
     #define G723_RATE_63 0 /* G723_Rate63 in owng723.h */
     #define G723_RATE_53 1 /* G723_Rate53 */
-    /* XXX also see "enum Crate WrkRate" below */
     #define G723_DEFAULT_SEND_RATE G723_RATE_63
 
     static int g723_sendrate = G723_DEFAULT_SEND_RATE;
@@ -242,8 +243,10 @@ static struct ast_frame *lintog72x_sample(void)
     f.frametype = AST_FRAME_VOICE;
 #if G72X_ASTERISK < 100
     f.FRAME_SUBCLASS = AST_FORMAT_SLINEAR;
-#else
+#elif G72X_ASTERISK == 100
     ast_format_set(&f.subclass.format, AST_FORMAT_SLINEAR, 0);
+#else /* 13.0+ */
+    f.subclass.format = ast_format_slin;
 #endif
     f.datalen = sizeof(slin_g72x_ex);
     f.samples = sizeof(slin_g72x_ex)/2;
@@ -260,8 +263,10 @@ static struct ast_frame *g72xtolin_sample(void)
     f.frametype = AST_FRAME_VOICE;
 #if G72X_ASTERISK < 100
     f.FRAME_SUBCLASS = G72X_AST_FORMAT;
-#else
+#elif G72X_ASTERISK == 100
     ast_format_set(&f.subclass.format, G72X_AST_FORMAT, 0);
+#else /* 13.0+ */
+    f.subclass.format = G72X_AST_FORMAT13;
 #endif
     f.datalen = sizeof(g72x_slin_ex);
     f.samples = G72X_SAMPLES;
@@ -479,6 +484,9 @@ static struct ast_translator g72xtolin = {
 #elif G72X_ASTERISK < 100
     .srcfmt = G72X_AST_FORMAT,
     .dstfmt = AST_FORMAT_SLINEAR,
+#elif G72X_ASTERISK >= 130
+    .src_codec = { .name = G72X_CODEC, .type = AST_MEDIA_TYPE_AUDIO, .sample_rate = 8000 },
+    .dst_codec = { .name = "slin",     .type = AST_MEDIA_TYPE_AUDIO, .sample_rate = 8000 },
 #endif
     .newpvt = g72xtolin_new,
     .framein = g72xtolin_framein,
@@ -502,6 +510,9 @@ static struct ast_translator lintog72x = {
 #elif G72X_ASTERISK < 100
     .srcfmt = AST_FORMAT_SLINEAR,
     .dstfmt = G72X_AST_FORMAT,
+#elif G72X_ASTERISK >= 130
+    .src_codec = { .name = "slin",     .type = AST_MEDIA_TYPE_AUDIO, .sample_rate = 8000 },
+    .dst_codec = { .name = G72X_CODEC, .type = AST_MEDIA_TYPE_AUDIO, .sample_rate = 8000 },
 #endif
     .newpvt = lintog72x_new,
     .framein = lintog72x_framein,
@@ -625,7 +636,7 @@ static int load_module(void)
 {
     int res;
 
-#if G72X_ASTERISK >= 100
+#if G72X_ASTERISK == 100
     ast_format_set(&lintog72x.src_format, AST_FORMAT_SLINEAR, 0);
     ast_format_set(&lintog72x.dst_format, G72X_AST_FORMAT, 0);
 
