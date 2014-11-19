@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -xe
 
 t=arkadi/asterisk-32bit:13
 docker build -t $t .
