@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -231,7 +231,7 @@ void VoiceActivityDetect_G729_32f(Ipp32f ReflectCoeff, Ipp32f *pLSF, Ipp32f *pAu
                 lNumZeroCrossing)/(Ipp32f) (FrameCounter-vadState->lLessEnergyCounter);
             ippsInterpolateC_G729_32f(vadState->MeanLSFVec, (Ipp32f)(FrameCounter-vadState->lLessEnergyCounter -1),
                                              pLSF, 1.0f, vadState->MeanLSFVec, LPC_ORDER);
-            ippsMulC_32f_I(1.0f/(Ipp32f) (FrameCounter-vadState->lLessEnergyCounter ), vadState->MeanLSFVec, LPC_ORDER);
+            ippsMulC_32f( vadState->MeanLSFVec, 1.0f/(Ipp32f) (FrameCounter-vadState->lLessEnergyCounter ), vadState->MeanLSFVec, LPC_ORDER);
         }
     }
 

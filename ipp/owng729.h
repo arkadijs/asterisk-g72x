@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2011 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -351,7 +351,6 @@ __INLINE void DecodeAdaptCodebookDelays(Ipp16s *prevFrameDelay, Ipp16s *prevFram
 
             maxPitchSearchDelay = (Ipp16s)(minPitchSearchDelay + 9);
             if(maxPitchSearchDelay > MAX_PITCH_LAG) {
-                maxPitchSearchDelay = MAX_PITCH_LAG;
                 minPitchSearchDelay = MAX_PITCH_LAG - 9;
             }
             if(type == G729D_CODEC /* i.e. 6.4 kbps */) {

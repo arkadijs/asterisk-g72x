@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2011 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -210,7 +210,7 @@ void GetParamFromBitstream( const Ipp8s *pSrcBitStream, ParamStream_G723 *Params
    }
    return;
 }
-
+#pragma optimize ("", off)
 static Ipp16s* Parm2Bits( Ipp32s param, Ipp16s *pBitStrm, Ipp32s ParamBitNum )
 {
    Ipp32s i;
@@ -221,6 +221,7 @@ static Ipp16s* Parm2Bits( Ipp32s param, Ipp16s *pBitStrm, Ipp32s ParamBitNum )
 
    return pBitStrm;
 }
+#pragma optimize ("", on)
 void    SetParam2Bitstream(G723Encoder_Obj* encoderObj, ParamStream_G723 *Params, Ipp8s *pDstBitStream)
 {
     Ipp32s  i;
@@ -234,7 +235,7 @@ void    SetParam2Bitstream(G723Encoder_Obj* encoderObj, ParamStream_G723 *Params
     switch (Params->FrameType) {
 
     case 0 :  /* untransmitted */
-       pBitStream = Parm2Bits( G723_UntransmittedFrame, pBitStream, 2 );
+       Parm2Bits( G723_UntransmittedFrame, pBitStream, 2 );
 
        pDstBitStream[0] = (Ipp8s)(Bits[0] ^ (Bits[1] << 1));
 
@@ -244,7 +245,7 @@ void    SetParam2Bitstream(G723Encoder_Obj* encoderObj, ParamStream_G723 *Params
        pBitStream = Parm2Bits( G723_SIDFrame, pBitStream, 2 );
 
        pBitStream = Parm2Bits( Params->lLSPIdx, pBitStream, 24 ); /* 24 bit lLSPIdx */
-       pBitStream = Parm2Bits( Params->sAmpIndex[0], pBitStream, 6 );/* Do Sid frame gain */
+       Parm2Bits( Params->sAmpIndex[0], pBitStream, 6 );/* Do Sid frame gain */
 
        pB = Bits;
        for ( i = 0 ; i < 4 ; i ++, pB+=8 )
@@ -285,7 +286,7 @@ void    SetParam2Bitstream(G723Encoder_Obj* encoderObj, ParamStream_G723 *Params
             pBitStream = Parm2Bits(Params->sAmplitude[0], pBitStream, 6);
             pBitStream = Parm2Bits(Params->sAmplitude[1] , pBitStream, 5);
             pBitStream = Parm2Bits(Params->sAmplitude[2], pBitStream, 6);
-            pBitStream = Parm2Bits(Params->sAmplitude[3], pBitStream, 5);
+            Parm2Bits(Params->sAmplitude[3], pBitStream, 5);
 
             pB = Bits;
             for ( i = 0 ; i < 24 ; i ++, pB+=8 )
@@ -609,7 +610,7 @@ void ExcitationResidual_G723_16s(const Ipp16s *pSrc1, const Ipp16s *pSrc2,  Ipp1
    for ( i = 0 ; i < G723_SBFR_LEN ; i ++ ) {
        sNormConv[i] = (Ipp16s)((-lConv[i] + 0x2000) >> 14);
    }
-   ippsAdd_16s_I(sNormConv,pSrcDst,G723_SBFR_LEN);
+   ippsAdd_16s(sNormConv,pSrcDst,pSrcDst,G723_SBFR_LEN);
 
    LOCAL_ARRAY_FREE(Ipp16s, sNormConv,G723_SBFR_LEN,encoderObj) ;
    LOCAL_ARRAY_FREE(Ipp32s, lConv,G723_SBFR_LEN,encoderObj) ;
@@ -914,7 +915,7 @@ void  FixedCodebookSearch_G723_16s(G723Encoder_Obj *encoderObj, ParamStream_G723
           sGain = PitchContrb[(Params->AdCdbkGain[sNSbfr]<<1)+1];
 
           /* Find correlations of h[] needed for the codebook search. */
-          ippsRShiftC_16s_I(1,ImpResp,G723_SBFR_LEN); /* Q13 -->  Q12*/
+          ippsRShiftC_16s(ImpResp,1,ImpResp,G723_SBFR_LEN); /* Q13 -->  Q12*/
           if (sPitchPeriod < G723_SBFR_LEN-2) {
               ippsHarmonicFilter_16s_I(sGain,sPitchPeriod,&ImpResp[sPitchPeriod],G723_SBFR_LEN-sPitchPeriod);
           }

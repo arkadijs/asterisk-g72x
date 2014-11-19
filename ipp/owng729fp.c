@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2004-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2004-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -26,7 +26,6 @@
 //
 */
 
-#include <stdlib.h>
 #include <math.h>
 #include "vadg729fp.h"
 #include "aux_fnxs.h"
@@ -246,7 +245,6 @@ Ipp32s ownAdaptiveCodebookSearch_G729A_32f(Ipp32f *pSrcExc, Ipp32f *pSrcTargetVe
   ippsDecodeAdaptiveVector_G729_32f_I(delayLine, pSrcExc);
   ippsDotProd_32f64f( pCorr, pSrcExc, SUBFR_LEN, &corr);
   if(corr > max){
-    max = corr;
     *fracPartPitchDelay = 1;
   }
   else
@@ -1900,7 +1898,7 @@ void Post_G729E(G729FPDecoder_Obj *decoderObj, Ipp32s pitchDelay, Ipp32f *pSigna
     /* Scale signal input of 1/A(gamma1) */
     if(fG0 > (Ipp32f)1.) {
       fTmp = (Ipp32f)1./fG0;
-      ippsMulC_32f_I(fTmp, pLTPSignal, SUBFR_LEN);
+      ippsMulC_32f(pLTPSignal, fTmp, pLTPSignal, SUBFR_LEN);
     }
 
     /* 1/A(gamma1) filtering, STPMemory is updated */
@@ -1960,10 +1958,6 @@ static void HarmonicPostFilter_G729_32f(Ipp32s valPitchDelay, Ipp32f *pSrc, Ipp3
             /* Compute den */
             ippsDotProd_32f(pDst, pDst, SUBFR_LEN, &LTPGainDenominator2);
 
-            if(isVarZero(LTPGainDenominator2)) {
-               /* select Ipp16s filter */
-                pDelayedSignal = pSignal + ((lPhase-1) * SUBFR_LENP1 + lOffset);
-            }
             if(LTPGainNumerator2 * LTPGainNumerator2 * LTPGainDenominator> LTPGainNumerator * LTPGainNumerator * LTPGainDenominator2) {
                /* select long filter */
                 LTPGainNumerator = LTPGainNumerator2;

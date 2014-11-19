@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -665,7 +665,7 @@ APIG729_Status G729Encode
         if(vadEnable == 1)
             j = VAD_LPC_DIM ;
         while(ippsAutoCorr_NormE_16s32s(yVal,LP_WINDOW_DIM,autoR,j+1,&i)!=ippStsNoErr) {
-            ippsRShiftC_16s_I(2,yVal,LP_WINDOW_DIM);
+            ippsRShiftC_16s(yVal,2,yVal,LP_WINDOW_DIM);
             norma+=4;
         }
         norma = (Ipp16s)(norma - i);
@@ -1294,7 +1294,7 @@ G729_CODECFUN(  APIG729_Status, apiG729EncodeVAD,
     norma=1;
     ippsMul_NR_16s_Sfs(LPC_WINDOW,hammingWin,yVal,LP_WINDOW_DIM,15);
     while(ippsAutoCorr_NormE_16s32s(yVal,LP_WINDOW_DIM,autoR,VAD_LPC_DIM +1,&i)!=ippStsNoErr) {
-        ippsRShiftC_16s_I(2,yVal,LP_WINDOW_DIM);
+        ippsRShiftC_16s(yVal,2,yVal,LP_WINDOW_DIM);
         norma+=4;
     }
     norma = (Ipp16s)(norma - i);
@@ -1346,7 +1346,7 @@ G729_CODECFUN(  APIG729_Status, apiG729EncodeVAD,
             CLEAR_SCRATCH_MEMORY(encoderObj);
             return APIG729_StsNoErr;
         }
-        *pAna++ = 1;
+        *pAna = 1;
         encoderObj->seed = SEED_INIT;
         encoderObj->CNGidx = 0;
         vM->VADPPrev = vM->VADPrev;
@@ -1441,7 +1441,7 @@ G729_CODECFUN(  APIG729_Status, apiG729EncodeVAD,
             CLEAR_SCRATCH_MEMORY(encoderObj);
             return APIG729_StsNoErr;
         }
-        *pAna++ = CodecTypeToRate[encoderObj->codecType];
+        *pAna = CodecTypeToRate[encoderObj->codecType];
         encoderObj->seed = SEED_INIT;
         vM->VADPPrev = vM->VADPrev;
         vM->VADPrev = Vad;
@@ -1486,7 +1486,7 @@ void vad_update_A(Ipp16s *pAq_t, Ipp16s *pAp_t, Ipp16s *exc, Ipp16s *speech, Ipp
         ippsSynthesisFilter_NR_16s_Sfs(pAp,val1,&wsp[i],LP_SUBFRAME_DIM, 12, SynFltSt->buffer);
         ippsCopy_16s((&wsp[i]+LP_SUBFRAME_DIM-LPF_DIM), SynFltSt->buffer, LPF_DIM);
 
-        ippsSub_16s_I(&exc[i],val1,LP_SUBFRAME_DIM);
+        ippsSub_16s(&exc[i],val1,val1,LP_SUBFRAME_DIM);
         ippsSynthesisFilterLow_NR_16s_ISfs(pAp_t,val1,LP_SUBFRAME_DIM,12,resFilMem0);
         ippsCopy_16s(&val1[LP_SUBFRAME_DIM-LPF_DIM],resFilMem0,LPF_DIM);
         pAq += LPF_DIM+1;
@@ -1586,7 +1586,7 @@ APIG729_Status G729AEncode
         if(vadEnable == 1)
             j = VAD_LPC_DIM ;
         while(ippsAutoCorr_NormE_16s32s(yVal,LP_WINDOW_DIM,autoR,j+1,&i)!=ippStsNoErr) {
-            ippsRShiftC_16s_I(2,yVal,LP_WINDOW_DIM);
+            ippsRShiftC_16s(yVal,2,yVal,LP_WINDOW_DIM);
             norma+=4;
         }
         norma = (Ipp16s)(norma - i);
@@ -1865,10 +1865,9 @@ APIG729_Status G729BaseEncode
         norma=1;
         ippsMul_NR_16s_Sfs(LPC_WINDOW,hammingWin,yVal,LP_WINDOW_DIM,15);
         while(ippsAutoCorr_NormE_16s32s(yVal,LP_WINDOW_DIM,autoR,LPF_DIM+1,&i)!=ippStsNoErr) {
-            ippsRShiftC_16s_I(2,yVal,LP_WINDOW_DIM);
+            ippsRShiftC_16s(yVal,2,yVal,LP_WINDOW_DIM);
             norma+=4;
         }
-        norma = (Ipp16s)(norma - i);
 
         ippsLagWindow_G729_32s_I(autoR+1,LPF_DIM);
         ippsLevinsonDurbin_G729B(autoR, &pAp_t[LPF_DIM+1],rCoeff,&s);

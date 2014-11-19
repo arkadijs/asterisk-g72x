@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2004-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2004-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -25,7 +25,6 @@
 // Purpose: G.729 floating-point speech codec: encode API functions.
 //
 */
-#include <stdlib.h>
 #include <math.h>
 #include "vadg729fp.h"
 #include "owng729fp.h"
@@ -373,7 +372,7 @@ G729_CODECFUN( APIG729_Status, apiG729FPEncode,
    else encoderObj->sFrameCounter++;
 
    ippsConvert_16s32f(src,newSpeech,FRM_LEN);
-   ippsIIR_32f_I(newSpeech,FRM_LEN,encoderObj->iirstate);
+   ippsIIR_32f(newSpeech,newSpeech,FRM_LEN,encoderObj->iirstate);
 #ifdef CLIPPING_DENORMAL_MODE
    ippsIIRGetDlyLine_32f(encoderObj->iirstate, TmpAlignVec);
    CLIP_DENORMAL_I(TmpAlignVec[0]);
@@ -384,7 +383,7 @@ G729_CODECFUN( APIG729_Status, apiG729FPEncode,
    ippsCopy_32f(forwardAutoCorr, TmpAutoCorr, LPC_ORDERP1);
 
    /* Lag windowing    */
-   ippsMul_32f_I(lwindow, &forwardAutoCorr[1], LPC_ORDERP2);
+   ippsMul_32f(lwindow, &forwardAutoCorr[1], &forwardAutoCorr[1], LPC_ORDERP2);
    /* Levinson Durbin  */
    tmp_lev = 0;
    sts = ippsLevinsonDurbin_G729_32f(forwardAutoCorr, LPC_ORDER, &forwardLPC[LPC_ORDERP1], forwardReflectCoeff, &tmp_lev);
@@ -524,7 +523,7 @@ G729_CODECFUN( APIG729_Status, apiG729FPEncode,
       /* LPC recursive Window as in G728 */
       ippsWinHybrid_G729E_32f(encoderObj->SynthBuffer, backwardAutoCorr, encoderObj->pHWState);
       /* Lag windowing    */
-      ippsMul_32f_I(lagBwd, &backwardAutoCorr[1], BWD_LPC_ORDER);
+      ippsMul_32f(lagBwd, &backwardAutoCorr[1], &backwardAutoCorr[1], BWD_LPC_ORDER);
       if (backwardAutoCorr[0] < 1.0f) backwardAutoCorr[0] = 1.0f;
       sts = ippsLevinsonDurbin_G729_32f(backwardAutoCorr, BWD_LPC_ORDER, &backwardLPC[BWD_LPC_ORDERP1], backwardReflectCoeff, &tmp_lev);
       if(sts == ippStsOverflow) {
@@ -1018,13 +1017,13 @@ G729_CODECFUN(  APIG729_Status, apiG729FPEncodeVAD,
 
    ippsConvert_16s32f(src,newSpeech,FRM_LEN);
 
-   ippsIIR_32f_I(newSpeech,FRM_LEN,encoderObj->iirstate);
+   ippsIIR_32f(newSpeech,newSpeech,FRM_LEN,encoderObj->iirstate);
 
    ownAutoCorr_G729_32f(pWindow, LPC_ORDERP2, forwardAutoCorr,TmpAlignVec);             /* Autocorrelations */
    ippsCopy_32f(forwardAutoCorr, TmpAutoCorr, LPC_ORDERP1);
 
    /* Lag windowing    */
-   ippsMul_32f_I(lwindow, &forwardAutoCorr[1], LPC_ORDERP2);
+   ippsMul_32f(lwindow, &forwardAutoCorr[1], &forwardAutoCorr[1], LPC_ORDERP2);
    /* Levinson Durbin  */
    tmp_lev = 0;
    sts = ippsLevinsonDurbin_G729_32f(forwardAutoCorr, LPC_ORDER, &forwardLPC[LPC_ORDERP1], forwardReflectCoeff, &tmp_lev);
@@ -1460,7 +1459,7 @@ static void UpdateVad_A(G729FPEncoder_Obj* encoderObj, Ipp32f *Excitation,
       for (i = 0; i < LPC_ORDER; i++)  CLIP_DENORMAL(WeightedSpeech[(SUBFR_LEN-LPC_ORDER)+i],encoderObj->FltMem[i]);
 
       /* Compute WeightedFilterMemory */
-      ippsSub_32f_I(&Excitation[NSbfr],TargetVector,SUBFR_LEN);
+      ippsSub_32f(&Excitation[NSbfr],TargetVector,TargetVector,SUBFR_LEN);
 
       ippsSynthesisFilter_G729_32f(forwardLPC, LPC_ORDER, TargetVector, TargetVector, SUBFR_LEN, encoderObj->WeightedFilterMemory);
       for (i = 0; i < LPC_ORDER; i++)  CLIP_DENORMAL(TargetVector[i],encoderObj->FltMem[i]);

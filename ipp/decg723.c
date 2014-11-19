@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2013 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -49,7 +49,7 @@ G723_CODECFUN( APIG723_Status, apiG723Decoder_Init,
 
     oldMemBuff = decoderObj->Mem.base; /* if Reinit */
 
-   ippsZero_16s((Ipp16s*)decoderObj,sizeof(G723Decoder_Obj)>>1) ;   /* non-initialized data, bug in debug mode AK27.08.01 */
+   ippsZero_8u((Ipp8u*)decoderObj,sizeof(G723Decoder_Obj)) ;   /* non-initialized data, bug in debug mode AK27.08.01 */
    decoderObj->objPrm.objSize = DecoderObjSize();
    decoderObj->objPrm.mode = mode;
    decoderObj->objPrm.key = G723_DEC_KEY;
@@ -233,7 +233,7 @@ G723_CODECFUN( APIG723_Status, apiG723Decode,
                       ippsCopy_16s(pData,Tmp,G723_SBFR_LEN);
                       /*  Generation of a Dirac train. Section 2.15 */
                       for ( j = CurrentParams.PitchLag[i>>1]; j < G723_SBFR_LEN ; j += CurrentParams.PitchLag[i>>1] ) {
-                         ippsAdd_16s_I(Tmp,&pData[j],G723_SBFR_LEN-j);
+                         ippsAdd_16s(Tmp,&pData[j],&pData[j],G723_SBFR_LEN-j);
                       }
                    }
                 }else{ /*rate53*/
@@ -249,8 +249,8 @@ G723_CODECFUN( APIG723_Status, apiG723Decode,
                                                   &TemporaryVector[G723_SBFR_LEN*i], AdaptiveVector, SA_Rate[CurrentParams.currRate]);
 
                 /* Codebook contributions to excitation. */
-                ippsLShiftC_16s_I(1,pData,G723_SBFR_LEN);
-                ippsAdd_16s_I(AdaptiveVector,pData,G723_SBFR_LEN);
+                ippsLShiftC_16s(pData,1,pData,G723_SBFR_LEN);
+                ippsAdd_16s(AdaptiveVector,pData,pData,G723_SBFR_LEN);
                 pData += G723_SBFR_LEN ;
             }
 
@@ -314,7 +314,8 @@ G723_CODECFUN( APIG723_Status, apiG723Decode,
            /* Formant post filter. Section 3.8 */
            PostFilter(decoderObj, pData, &CurrLPC[i*(G723_LPC_ORDER+1)+1] ) ;
         }else{
-           ippsMulC_16s_I(2,pData,G723_SBFR_LEN);
+           //ippsMulC_16s_I(2,pData,G723_SBFR_LEN);
+           ippsMulC_16s_Sfs(pData,2,pData,G723_SBFR_LEN,0);
         }
         pData += G723_SBFR_LEN ;
     }

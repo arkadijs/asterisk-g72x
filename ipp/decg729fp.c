@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2004-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2004-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -288,8 +288,6 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
       decPrm[9] = ExtractBitsG729FP(&pParm,&i,9);
       decPrm[10] = ExtractBitsG729FP(&pParm,&i,2);
       decPrm[11] = ExtractBitsG729FP(&pParm,&i,6);
-
-      rate = G729E_MODE;
    }else if(frametype == 3){ /* active frame */
       i=0;
       decPrm[1] = 3; /* FrameType=voice e */
@@ -306,7 +304,6 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
       decPrm[1+10] = ExtractBitsG729FP(&pParm,&i,4);
       decPrm[1+11] = ExtractBitsG729FP(&pParm,&i,7);
       decPrm[1+4] = (Parity(decPrm[1+3])+decPrm[1+4]) & 1; /*  parity error (1) */
-      rate = G729_BASE;
    }else if(frametype == 4){ /* active frame E*/
       i=0;
       decPrm[0] = 0; /* bfi = 0*/
@@ -360,7 +357,6 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
          decPrm[4] += i;
          decPrm[4] = (Parity(decPrm[3])+decPrm[4]) & 1;/* parm[4] = parity error (1) */
       }
-      rate = G729E_MODE;
    }
    pDecPrm = &decPrm[0];
    parm2 = pDecPrm[2];
@@ -396,7 +392,7 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
       ippsWinHybrid_G729E_32f(decoderObj->SynthBuffer, forwardAutoCorr, decoderObj->pHWState);
 
       /* Lag windowing    */
-      ippsMul_32f_I(lagBwd, &forwardAutoCorr[1], BWD_LPC_ORDER);
+      ippsMul_32f(lagBwd, &forwardAutoCorr[1], &forwardAutoCorr[1], BWD_LPC_ORDER);
       if (forwardAutoCorr[0]<1.0) forwardAutoCorr[0]=1.0;
 
       sts = ippsLevinsonDurbin_G729_32f(forwardAutoCorr, BWD_LPC_ORDER, &backwardLPC[BWD_LPC_ORDERP1], backwardReflectCoeff, &tmp_lev);
@@ -498,7 +494,6 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
       decoderObj->fInterpolationCoeff = 1.1f;
       /* Reset for gain decoding in case of frame erasure */
       decoderObj->sBWDStatInd = 0;
-      highStatIndicator = 0;
       /* Reset for pitch tracking  in case of frame erasure */
       decoderObj->lStatPitchPT = 0;
       /* Update the previous filter for the next frame */
@@ -923,7 +918,7 @@ G729_CODECFUN( APIG729_Status, apiG729FPDecode,
       Post_G729A(decoderObj,flDst, forwardLPC, T2, Vad);
    }
    /* Highpass filter */
-   ippsIIR_32f_I(flDst,FRM_LEN,decoderObj->iirstate);
+   ippsIIR_32f(flDst,flDst,FRM_LEN,decoderObj->iirstate);
 
    /* Round to nearest and convert to Ipp16s*/
    {

@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2012 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -424,12 +424,12 @@ void NoiseExcitationFactorization_G729B_16s(const Ipp16s *pSrc,
     order -= 15;
     ippsMulC_NR_16s_Sfs(pSrc,tmp1,pDst,len,15);
     if(order<0) {
-        ippsLShiftC_16s_I(-order,pDst,len);
+        ippsLShiftC_16s(pDst,-order,pDst,len);
     } else if(order>0) {
         Ipp16s const1=(Ipp16s)(1<<(order-1));
-        ippsAddC_16s_I(const1,pDst,len);
+        ippsAddC_16s_Sfs(pDst,const1,pDst,len,0);
         /* ippsRShiftC_NR_16s_I() */
-        ippsRShiftC_16s_I(order,pDst,len);
+        ippsRShiftC_16s(pDst,order,pDst,len);
     }
 }
 
@@ -442,7 +442,7 @@ Ipp32s ComfortNoiseExcitation_G729B_16s_I(const Ipp16s *pSrc, const Ipp16s *pPos
     Ipp32s   L_tmp, L_tmp1, L_tmp2, order, deltaSign = 1;
 
     ippsMulC_NR_16s_ISfs(x3,pSrcDst,LP_SUBFRAME_DIM,15);
-    ippsAdd_16s_ISfs(pSrc,pSrcDst,LP_SUBFRAME_DIM,0);
+    ippsAdd_16s_Sfs(pSrc,pSrcDst,pSrcDst,LP_SUBFRAME_DIM,0);
     ippsMax_16s(pSrcDst,LP_SUBFRAME_DIM,&tmp1);
     ippsMin_16s(pSrcDst,LP_SUBFRAME_DIM,&tmp2);
     if(tmp2==IPP_MIN_16S)

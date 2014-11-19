@@ -4,7 +4,7 @@
 //     This software is supplied under the terms of a license agreement or
 //     nondisclosure agreement with Intel Corporation and may not be copied
 //     or disclosed except in accordance with the terms of that agreement.
-//          Copyright(c) 2005-2010 Intel Corporation. All Rights Reserved.
+//          Copyright(c) 2005-2013 Intel Corporation. All Rights Reserved.
 //
 //     Intel(R) Integrated Performance Primitives
 //     USC - Unified Speech Codec interface library
@@ -26,7 +26,6 @@
 //
 */
 
-#include <stdlib.h>
 #include <ippsc.h>
 #include "owng729.h"
 
@@ -291,7 +290,6 @@ APIG729_Status G729Decode
 
     delayVal[0]=delayVal[1]=0;
 
-    pA = AzDec;
     pParm = src;
     if(frametype == -1) {
         decoderObj->decPrm[1] = 0;
@@ -517,7 +515,7 @@ APIG729_Status G729Decode
                 tmp2 = (Ipp16s)ComfortNoiseExcitation_G729B_16s_I(excg,IdxVec,pulseSignVec,gainNow,pG2,&excitation[i],&tmp,tempArray);
                 if(tmp2 < 0) gpVal = 0;
                 if(tmp < 0) tmp = -tmp;
-
+                
                 ippsPhaseDispersionUpdate_G729D_16s((Ipp16s)gpVal,tmp,decoderObj->PhDispMem);
 
                 LOCAL_ARRAY_FREE(Ipp16s,tempArray,LP_SUBFRAME_DIM, decoderObj);
@@ -538,7 +536,7 @@ APIG729_Status G729Decode
             if(SynthesisFilter_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,20)==
                ippStsOverflow) {
                 /* scale down excitation and redo in case of overflow */
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 SynthesisFilterOvf_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,20);
             }
 
@@ -910,7 +908,7 @@ APIG729_Status G729Decode
                 status = SynthesisFilter_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,BWLPCF_DIM-mAq);
             if(status == ippStsOverflow) {
 
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 SynthesisFilterOvf_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,BWLPCF_DIM-mAq);
             }
             if(decoderObj->codecType == G729D_CODEC) {
@@ -1075,7 +1073,7 @@ void Post_G729Base(
         }
     }
 
-    ippsAbs_16s_I(y,IMP_RESP_LEN);
+    ippsAbs_16s(y,y,IMP_RESP_LEN);
     ippsSum_16s32s_Sfs(y,IMP_RESP_LEN,&L_g0Val,0);
     g0Val = (Ipp16s)(ShiftL_32s(L_g0Val, 14)>>16);
 
@@ -1212,7 +1210,7 @@ void Post_G729I( Ipp16s delayVal, Ipp16s subfrIdx, const Ipp16s *srcLPC, Ipp16s 
             tmp = (Ipp16s)(-tmp);
         }
     }
-    ippsAbs_16s_I(y,L_hSt);
+    ippsAbs_16s(y,y,L_hSt);
     ippsSum_16s32s_Sfs(y,L_hSt,&L_g0Val,0);
     g0Val = (Ipp16s)(ShiftL_32s(L_g0Val, 14)>>16);
     if(g0Val > 1024) {
@@ -1240,7 +1238,7 @@ void Post_G729I( Ipp16s delayVal, Ipp16s subfrIdx, const Ipp16s *srcLPC, Ipp16s 
 APIG729_Status G729ADecode
 (G729Decoder_Obj* decoderObj,const Ipp8u* src, Ipp32s frametype, Ipp16s* dst) {
 
-    LOCAL_ALIGN_ARRAY(32, Ipp16s, AzDec, (LPF_DIM+1)*2,decoderObj);
+/*    LOCAL_ALIGN_ARRAY(32, Ipp16s, AzDec, (LPF_DIM+1)*2,decoderObj); */
     LOCAL_ALIGN_ARRAY(32, Ipp16s, newLSP,LPF_DIM,decoderObj);
     LOCAL_ALIGN_ARRAY(32, Ipp16s, ACELPcodeVec, LP_SUBFRAME_DIM,decoderObj);
     LOCAL_ALIGN_ARRAY(32, Ipp16s, FWDfiltLPC, 2*LPF_DIM+2,decoderObj);
@@ -1269,7 +1267,6 @@ APIG729_Status G729ADecode
         return APIG729_StsBadCodecType;
 
     delayVal[0]=delayVal[1]=0;
-    pA = AzDec;
     pParm = src;
 
     if(frametype == -1) {
@@ -1380,7 +1377,7 @@ APIG729_Status G729ADecode
         for(subfrIdx = 0; subfrIdx < LP_FRAME_DIM; subfrIdx += LP_SUBFRAME_DIM) {
             if(ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx], LP_SUBFRAME_DIM, 12,
                                               ((SynthesisFilterState*)synFltw)->buffer)==ippStsOverflow) {
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,12,
                                                ((SynthesisFilterState*)synFltw)->buffer);
             }
@@ -1494,7 +1491,7 @@ APIG729_Status G729ADecode
             if(ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx], LP_SUBFRAME_DIM, 12,
                                               ((SynthesisFilterState*)synFltw)->buffer)==ippStsOverflow) {
 
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,12,
                                                ((SynthesisFilterState*)synFltw)->buffer);
             }
@@ -1670,7 +1667,7 @@ APIG729_Status G729BaseDecode
         for(subfrIdx = 0; subfrIdx < LP_FRAME_DIM; subfrIdx += LP_SUBFRAME_DIM) {
             if(ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,12,
                                               ((SynthesisFilterState*)synFltw)->buffer+BWLPCF_DIM-LPF_DIM)==ippStsOverflow) {
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 SynthesisFilterOvf_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,20);
             } else
                 ippsCopy_16s((&synth[subfrIdx]+LP_SUBFRAME_DIM-LPF_DIM), ((SynthesisFilterState*)synFltw)->buffer+BWLPCF_DIM-LPF_DIM, LPF_DIM );
@@ -1797,7 +1794,7 @@ APIG729_Status G729BaseDecode
             status = ippsSynthesisFilter_NR_16s_Sfs(ppAz,&excitation[subfrIdx],&synth[subfrIdx], LP_SUBFRAME_DIM, 12,
                                                     ((SynthesisFilterState*)synFltw)->buffer+BWLPCF_DIM-LPF_DIM);
             if(status == ippStsOverflow) {
-                ippsRShiftC_16s_I(2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
+                ippsRShiftC_16s(prevExcitat,2,prevExcitat,L_prevExcitat+LP_FRAME_DIM);
                 SynthesisFilterOvf_G729_16s(ppAz,&excitation[subfrIdx],&synth[subfrIdx],LP_SUBFRAME_DIM,synFltw,BWLPCF_DIM-LPF_DIM);
             } else
                 ippsCopy_16s((&synth[subfrIdx]+LP_SUBFRAME_DIM-LPF_DIM), ((SynthesisFilterState*)synFltw)->buffer+BWLPCF_DIM-LPF_DIM, LPF_DIM );
