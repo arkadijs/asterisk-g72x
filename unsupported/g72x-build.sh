@@ -2,8 +2,9 @@
 
 BUILD_GCC=1
 #BUILD_ICC=1
-BUILD_32=1
-#BUILD_64=1
+file /bin/ls | grep -q 32-bit && BUILD_32=1
+file /bin/ls | grep -q 64-bit && BUILD_64=1
+
 ipproot_prefix53=/opt/intel2/ipp/5.3
 ipproot_prefix=/opt/intel2/ipp/6.1
 
@@ -104,7 +105,6 @@ fi
 if [ -n "$BUILD_64" ]; then
 # -----------------------
 cc=gcc
-#cc=x86_64-unknown-linux-gnu-gcc-4.5.2
 ipproot=$ipproot_prefix/em64t
 #ipplibs="-lippscemergedem64t -lippsremergedem64t -lippsemergedem64t -lippscmergedem64t -lippsrmergedem64t -lippsmergedem64t -lippcoreem64t"
 ipplibs="-lippscmergedem64t -lippsrmergedem64t -lippsmergedem64t -lippcoreem64t"
@@ -178,59 +178,10 @@ popd
 srcdir=.
 mkdir -p bin/
 
-a=trunk
-ast=/home/arkadi/opt/asterisk-trunk
-def2=-DG72X_ASTERISK=101
-#codec=g729 dir=$srcdir all &
-#codec=g723 dir=$srcdir all &
-
 a=ast130
 ast=/opt/asterisk-13
 def2=-DG72X_ASTERISK=130
 codec=g729 dir=$srcdir all &
 codec=g723 dir=$srcdir all &
-
-a=ast120
-ast=/home/arkadi/Work/asterisk-12
-def2=-DG72X_ASTERISK=120
-#codec=g729 dir=$srcdir all &
-#codec=g723 dir=$srcdir all &
-
-a=ast110
-ast=/home/arkadi/Work/asterisk-11
-def2=-DG72X_ASTERISK=110
-#codec=g729 dir=$srcdir all &
-#codec=g723 dir=$srcdir all &
-
-a=ast18
-ast=/home/arkadi/opt/asterisk-1.8.1.1
-ast=/home/arkadi/tmp/src/asterisk-uclibc-dave
-def2=-DG72X_ASTERISK=18
-#codec=g729 dir=$srcdir all
-#codec=g723 dir=$srcdir all
-
-a=ast16
-ast=/home/arkadi/opt/asterisk-1.6.2
-def2=-DG72X_ASTERISK=16
-#codec=g729 dir=$srcdir all &
-#codec=g723 dir=$srcdir all &
-
-a=ast14
-ast=/home/arkadi/opt/asterisk-1.4
-#ast=/home/arkadi/opt/asterisk-1.4-uclibc
-def2=-DG72X_ASTERISK=14
-#codec=g729 dir=$srcdir all
-#codec=g723 dir=$srcdir all &
-
-a=ast12
-ast=/home/arkadi/opt/asterisk-1.2
-#codec=g729 dir=1.2/G729-float all
-#codec=g723 dir=1.2/G723.1     all
-
-export C_INCLUDE_PATH=/home/arkadi/tmp/src/callweaver-1.2.1/include
-a=callweaver
-ast=/home/arkadi/opt/callweaver
-#codec=g729 dir=g72x-for-callweaver-1.2/G729-float all
-#codec=g723 dir=g72x-for-callweaver-1.2/G723.1     all
 
 wait
