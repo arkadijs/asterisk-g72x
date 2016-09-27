@@ -8,11 +8,14 @@
 #include <time.h>
 
 /* single file implements both G.729 and G.723.1, both IPP and Bcg729 based codecs,
-   Asterisk 1.4 to 12 */
+   Asterisk 1.4 to 14 */
 /* quite a lot of preprocessor abuse, but still better than maintaining multiple
    similar files */
 
 #if G72X_ASTERISK
+    #if G72X_ASTERISK >= 140
+        #define AST_MODULE_SELF_SYM __internal_g72x_self
+    #endif
 
     #ifdef ASTERISK_ASTERISK_H
         /* Ubuntu */
@@ -23,6 +26,9 @@
     #include <asterisk/lock.h>
     #include <asterisk/translate.h>
     #include <asterisk/module.h>
+    #if G72X_ASTERISK >= 110
+        ASTERISK_REGISTER_FILE()
+    #endif
     #include <asterisk/logger.h>
     #include <asterisk/channel.h>
     #include <asterisk/utils.h>
@@ -687,7 +693,9 @@ static int unload_module(void)
     return res;
 }
 
-ASTERISK_FILE_VERSION(__FILE__, "1.0")
+#if G72X_ASTERISK < 110
+    ASTERISK_FILE_VERSION(__FILE__, "1.0")
+#endif
 
 #if G72X_ASTERISK >= 14
     /* AST_MODULE_INFO_STANDARD(ASTERISK_GPL_KEY, G72X_CODEC " Coder/Decoder"); */

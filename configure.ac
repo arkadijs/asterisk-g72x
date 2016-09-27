@@ -41,7 +41,7 @@ if test "${prefix}" != "/usr"; then
 fi
 #echo new prefix: "${prefix}"
 
-ASTERISK_VERSION="100";
+ASTERISK_VERSION="140";
 
 AC_ARG_WITH(asterisk-includes,
     AS_HELP_STRING([--with-asterisk-includes=PATH], [Path to Asterisk includes (defaults to PREFIX/include, so try --prefix first)]),
@@ -59,14 +59,14 @@ AC_ARG_WITH(asterisk18,
     AS_HELP_STRING([--with-asterisk18], [Build for Asterisk 1.8]),
     [ASTERISK_VERSION="18"])
 AC_ARG_WITH(asterisk100,
-    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10, 11, 12 (the default)]),
+    AS_HELP_STRING([--with-asterisk100], [Build for Asterisk 10, 11, 12]),
     [ASTERISK_VERSION="100"])
 AC_ARG_WITH(asterisk130,
     AS_HELP_STRING([--with-asterisk130], [Build for Asterisk 13]),
     [ASTERISK_VERSION="130"])
-#AC_ARG_WITH(asterisk101,
-#    AS_HELP_STRING([--with-asterisk101], [Build for Asterisk SVN TRUNK]),
-#    [ASTERISK_VERSION="101"])
+AC_ARG_WITH(asterisk140,
+    AS_HELP_STRING([--with-asterisk140], [Build for Asterisk 14 (the default)]),
+    [ASTERISK_VERSION="140"])
 #AC_ARG_WITH(callweaver,
 #    AS_HELP_STRING([--with-callweaver=PATH], [Build for CallWeaver (not supported yet)]),
 #    [CALLWEAVER_CFLAGS="-DG72X_CALLWEAVER -I\"$withval\""])
