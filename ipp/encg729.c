@@ -26,8 +26,13 @@
 //
 */
 
-#include <ippsc.h>
-#include <ipps.h>
+#ifndef G72X_IPP_LEGACY
+    #include <ipps.h>
+    #include <ippsc.h>
+#else
+    #include <ipps90legacy.h>
+    #include <ippsc90legacy.h>
+#endif
 #include "vadg729.h"
 #include "owng729.h"
 

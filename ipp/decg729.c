@@ -26,7 +26,13 @@
 //
 */
 
-#include <ippsc.h>
+#ifndef G72X_IPP_LEGACY
+    #include <ipps.h>
+    #include <ippsc.h>
+#else
+    #include <ipps90legacy.h>
+    #include <ippsc90legacy.h>
+#endif
 #include "owng729.h"
 
 /* HPF coefficients */
@@ -515,7 +521,7 @@ APIG729_Status G729Decode
                 tmp2 = (Ipp16s)ComfortNoiseExcitation_G729B_16s_I(excg,IdxVec,pulseSignVec,gainNow,pG2,&excitation[i],&tmp,tempArray);
                 if(tmp2 < 0) gpVal = 0;
                 if(tmp < 0) tmp = -tmp;
-                
+
                 ippsPhaseDispersionUpdate_G729D_16s((Ipp16s)gpVal,tmp,decoderObj->PhDispMem);
 
                 LOCAL_ARRAY_FREE(Ipp16s,tempArray,LP_SUBFRAME_DIM, decoderObj);

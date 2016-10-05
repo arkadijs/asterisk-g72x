@@ -95,15 +95,15 @@ AC_ARG_WITH(bcg729,
 # p8 - core2 penryn sse4.1, core i7 nehalem sse4.2 & westmere aes-ni mini-dispatcher
 # s8 - atom ssse3
 # g9 - sandy bridge avx
-# h9 - avx2
+# h9 - haswell avx2
 # 64-bit
 # mx - older amd64 w/o sse3?
 # m7 - pentium4 prescott sse3 em64t
 # u8 - core2 ssse3
 # y8 - core2 penryn sse4.1, core i7 nehalem sse4.2 & westmere aes-ni mini-dispatcher
-# n8 - atom
+# n8 - atom ssse3
 # e9 - sandy bridge avx
-# l9 - avx2
+# l9 - haswell avx2
 # i7 - itanium
 
 #              sse3   ssse3  sse4.1
@@ -236,10 +236,17 @@ if test -z "$G72X_BCG729"; then
         AC_MSG_CHECKING([location of IPP libraries])
         with_ipp_to_override=" (use --with-ipp=/path/to/ipp to override)"
 
-        # 7.0+
-        ipp_dir="/opt/intel/composerxe/ipp"
+        ipp_dir="/opt/intel/ipp"
         if test -d "$ipp_dir/"; then
             ipp_root="$ipp_dir"
+        fi
+
+        if test -z "$ipp_root"; then
+            # IPP 7.0, 8.0
+            ipp_dir="/opt/intel/composerxe/ipp"
+            if test -d "$ipp_dir/"; then
+                ipp_root="$ipp_dir"
+            fi
         fi
 
         if test -z "$ipp_root"; then
@@ -269,14 +276,14 @@ if test -z "$G72X_BCG729"; then
         fi
     fi
 
-    ipp_vh="$ipp_root"/include/ippversion.h
-    if test ! -f "$ipp_vh"; then
-        AC_MSG_ERROR([IPP not found in $ipp_root])
+    ipp_version_h="$ipp_root"/include/ippversion.h
+    if test ! -f "$ipp_version_h"; then
+        AC_MSG_ERROR([IPP $ipp_version_h not found])
     fi
 
     AC_MSG_CHECKING([version of IPP libraries])
-    ipp_major=$(grep IPP_VERSION_MAJOR "$ipp_vh" | cut -d\  -f3)
-    ipp_minor=$(grep IPP_VERSION_MINOR "$ipp_vh" | cut -d\  -f3)
+    ipp_major=$(grep IPP_VERSION_MAJOR "$ipp_version_h" | awk '{print $3}')
+    ipp_minor=$(grep IPP_VERSION_MINOR "$ipp_version_h" | awk '{print $3}')
     ipp_ver=$ipp_major.$ipp_minor
     AC_MSG_RESULT([$ipp_ver])
 
@@ -332,7 +339,21 @@ if test -z "$G72X_BCG729"; then
     esac
 
     IPP_CFLAGS="-I\"$ipp_root/include\" $ipp_cdefs";
-    if test $ipp_major -eq 8; then
+    if test $ipp_major -ge 9; then
+        # need IPP Legacy to build speech codecs
+        AC_MSG_CHECKING([for legacy IPP 9.0 libraries])
+        ipp_legacy_h="$ipp_root"/legacy/include/ipps90legacy.h
+        if test ! -f "$ipp_legacy_h"; then
+            AC_MSG_ERROR([IPP $ipp_legacy_h not found])
+        fi
+        ipp_legacy_libsvml="$ipp_root"/legacy/lib/$ipp_arch/libsvml.a
+        if test ! -f "$ipp_legacy_libsvml"; then
+            AC_MSG_ERROR([IPP $ipp_legacy_libsvml not found])
+        fi
+        AC_MSG_RESULT([$ipp_legacy_h $ipp_legacy_libsvml])
+        IPP_CFLAGS="$IPP_CFLAGS -DG72X_IPP_LEGACY -I\"$ipp_root/legacy/include\" -Wno-deprecated-declarations";
+        IPP_LIBS="$ipp_root/legacy/lib/$ipp_arch/libippsc90lgc.a $ipp_root/legacy/lib/$ipp_arch/libipps90lgc.a $ipp_root/lib/$ipp_arch/libipps.a $ipp_root/lib/$ipp_arch/libippvm.a $ipp_root/lib/$ipp_arch/libippcore.a $ipp_root/legacy/lib/$ipp_arch/libirc.a $ipp_root/legacy/lib/$ipp_arch/libsvml.a"
+    elif test $ipp_major -eq 8; then
         IPP_LIBS="$ipp_root/lib/$ipp_arch/libippsc.a $ipp_root/lib/$ipp_arch/libipps.a $ipp_root/lib/$ipp_arch/libippvm.a $ipp_root/lib/$ipp_arch/libippcore.a $ipp_root/../compiler/lib/$ipp_arch/libirc.a $ipp_root/../compiler/lib/$ipp_arch/libsvml.a"
     elif test $ipp_major -eq 7; then
         IPP_LIBS="-lippsc_l -lipps_l -lippcore_l"

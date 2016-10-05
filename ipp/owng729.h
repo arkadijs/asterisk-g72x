@@ -33,8 +33,13 @@
 #pragma warning( disable : 4505 )
 #endif
 
-#include <ipps.h>
-#include <ippsc.h>
+#ifndef G72X_IPP_LEGACY
+    #include <ipps.h>
+    #include <ippsc.h>
+#else
+    #include <ipps90legacy.h>
+    #include <ippsc90legacy.h>
+#endif
 #include "g729api.h"
 #include "scratchmem.h"
 

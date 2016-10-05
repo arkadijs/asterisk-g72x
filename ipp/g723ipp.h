@@ -29,8 +29,12 @@
 #ifndef __G723IPP_H__
 #define __G723IPP_H__
 
-#include <ipps.h>
-#include <ippsc.h>
-
+#ifndef G72X_IPP_LEGACY
+    #include <ipps.h>
+    #include <ippsc.h>
+#else
+    #include <ipps90legacy.h>
+    #include <ippsc90legacy.h>
+#endif
 #endif /* __G723IPP_H__ */
 

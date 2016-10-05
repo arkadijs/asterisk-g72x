@@ -29,8 +29,13 @@
 #ifndef __OWNG729FP_H__
 #define __OWNG729FP_H__
 
-#include <ipps.h>
-#include <ippsc.h>
+#ifndef G72X_IPP_LEGACY
+    #include <ipps.h>
+    #include <ippsc.h>
+#else
+    #include <ipps90legacy.h>
+    #include <ippsc90legacy.h>
+#endif
 #include "g729fpapi.h"
 #include "scratchmem.h"
 
