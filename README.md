@@ -6,7 +6,7 @@
 
 To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, download and install [Bcg729] - a slightly slower implementation written in portable C99. Only G.729 will be available in that case.
 
-The codecs are tested against Bcg729 1.0.0, IPP 5.3 - 8.2. Users of IPP 9.0 and IPP 2017 must also install [IPP Legacy] libraries. AMD processors works with IPP too.
+The codecs are tested against Bcg729 1.0.2, IPP 5.3 - 8.2. Users of IPP 9.0 and IPP 2017 must also install [IPP Legacy] libraries. AMD processors works with IPP too.
 
 #### IPP
 
