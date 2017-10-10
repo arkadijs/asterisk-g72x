@@ -26,7 +26,7 @@
     #include <asterisk/lock.h>
     #include <asterisk/translate.h>
     #include <asterisk/module.h>
-    #if G72X_ASTERISK >= 110
+    #if G72X_ASTERISK >= 110 && G72X_ASTERISK < 150
         ASTERISK_REGISTER_FILE()
     #endif
     #include <asterisk/logger.h>

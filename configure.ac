@@ -41,14 +41,11 @@ if test "${prefix}" != "/usr"; then
 fi
 #echo new prefix: "${prefix}"
 
-ASTERISK_VERSION="140";
+ASTERISK_VERSION="150";
 
 AC_ARG_WITH(asterisk-includes,
     AS_HELP_STRING([--with-asterisk-includes=PATH], [Path to Asterisk includes (defaults to PREFIX/include, so try --prefix first)]),
     [ASTERISK_CFLAGS="-I\"$withval\""])
-#AC_ARG_WITH(asterisk12,
-#    AS_HELP_STRING([--with-asterisk12], [Build for Asterisk 1.2 (not supported yet)]),
-#    [ASTERISK_VERSION="12"])
 AC_ARG_WITH(asterisk14,
     AS_HELP_STRING([--with-asterisk14], [Build for Asterisk 1.4]),
     [ASTERISK_VERSION="14"])
@@ -65,11 +62,11 @@ AC_ARG_WITH(asterisk130,
     AS_HELP_STRING([--with-asterisk130], [Build for Asterisk 13]),
     [ASTERISK_VERSION="130"])
 AC_ARG_WITH(asterisk140,
-    AS_HELP_STRING([--with-asterisk140], [Build for Asterisk 14 (the default)]),
+    AS_HELP_STRING([--with-asterisk140], [Build for Asterisk 14]),
     [ASTERISK_VERSION="140"])
-#AC_ARG_WITH(callweaver,
-#    AS_HELP_STRING([--with-callweaver=PATH], [Build for CallWeaver (not supported yet)]),
-#    [CALLWEAVER_CFLAGS="-DG72X_CALLWEAVER -I\"$withval\""])
+AC_ARG_WITH(asterisk150,
+    AS_HELP_STRING([--with-asterisk150], [Build for Asterisk 15 (the default)]),
+    [ASTERISK_VERSION="150"])
 
 AC_ARG_WITH(ipp,
     AS_HELP_STRING([--with-ipp=PATH], [Path to Intel IPP (/path/to/ipp)]),
@@ -401,7 +398,6 @@ AM_CONDITIONAL([G729_NOFP], [test -n "$G72X_9_NOFP" -a -z "$G72X_BCG729"])
 AC_SUBST([ASTERISK_ASTERISK_H])
 AC_SUBST([ASTERISK_CFLAGS])
 AC_SUBST([ASTERISK_VERSION])
-AC_SUBST([CALLWEAVER_CFLAGS])
 AC_SUBST([IPP_CFLAGS])
 AC_SUBST([IPP_LDFLAGS])
 AC_SUBST([IPP_LIBS])
