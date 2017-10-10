@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -xe
 
 b="$1"
 shift

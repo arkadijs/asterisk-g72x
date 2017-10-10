@@ -178,9 +178,9 @@ popd
 srcdir=.
 mkdir -p bin/
 
-a=ast140
+a=ast150
 ast=/opt/asterisk
-def2=-DG72X_ASTERISK=140
+def2=-DG72X_ASTERISK=150
 codec=g729 dir=$srcdir all &
 codec=g723 dir=$srcdir all &
 
