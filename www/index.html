@@ -31,7 +31,7 @@
 <h3>
 G.729 and G.723.1 codecs for Asterisk open source PBX
 </h3>
-
+<!--
 <div style="float: right; margin-left: 1em; text-align: center;">
     <a href="http://support.smiletrain.org/site/Donation2?df_id=1740&1740.donation=form1">
         <img border="0" alt="Donate to SmileTrain" src="smiletrain-donate-now-btn7.jpg"/>
@@ -62,7 +62,7 @@ G.729 and G.723.1 codecs for Asterisk open source PBX
             <input type="image" style="margin-top: 5px;" src="https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif" border="0" name="submit" alt="Donate via PayPal">
             <input type="hidden" name="cmd" value="_donations">
             <input type="hidden" name="business" value="FNSEZ2ASPAKJL">
-            <!--<input type="hidden" name="lc" value="LV">-->
+            <!- -<input type="hidden" name="lc" value="LV">- ->
             <input type="hidden" name="item_number" value="Donation to help support asterisk.hosting.lv">
         </form>
     </fieldset>
@@ -71,7 +71,7 @@ G.729 and G.723.1 codecs for Asterisk open source PBX
         1DZ4mwBAqjWxQuJua<br>
         UydtG2WaTJfinuc7s</small>
 </div>
-
+-->
 <ul>
     <li><a href="#src">Sources</a></li>
     <li><a href="#bin">Binaries</a></li>
@@ -81,9 +81,9 @@ G.729 and G.723.1 codecs for Asterisk open source PBX
 
 <h4><a name="src">Sources</a></h4>
 To compile the codecs it is recommended to install <a href="https://software.intel.com/en-us/intel-ipp">Intel IPP</a>
-libraries for better performance. Asterisk 1.4 to 15 are supported.
+libraries for better performance. Asterisk 1.4 to 16 are supported.
 <ul>
-    <li><a href="src/asterisk-g72x-1.4.2.tar.bz2">asterisk-g72x-1.4.2.tar.bz2</a> - supports Asterisk 1.4 to 15, <a href="https://github.com/BelledonneCommunications/bcg729">Bcg729</a> 1.0.2</li>
+    <li><a href="src/asterisk-g72x-1.4.3.tar.bz2">asterisk-g72x-1.4.3.tar.bz2</a> - supports Asterisk 1.4 to 16, <a href="https://github.com/BelledonneCommunications/bcg729">Bcg729</a> 1.0.2</li>
     <li><a href="https://bitbucket.org/arkadi/asterisk-g72x/src/tip/README.md">README</a></li>
     <li><i>hg clone</i> <a href="http://bitbucket.org/arkadi/asterisk-g72x">http://bitbucket.org/arkadi/asterisk-g72x</a></li>
     <li><i>hg clone</i> <a href="http://asterisk.hosting.lv/hg/">http://asterisk.hosting.lv/hg</a> asterisk-g72x</li>
@@ -468,6 +468,58 @@ Linux binaries
 <li><a href="bin/codec_g729-ast150-gcc4-glibc-x86_64-opteron.so">codec_g729-ast150-gcc4-glibc-x86_64-opteron.so</a></li>
 <li><a href="bin/codec_g729-ast150-gcc4-glibc-x86_64-opteron-sse3.so">codec_g729-ast150-gcc4-glibc-x86_64-opteron-sse3.so</a></li>
 <li><a href="bin/codec_g729-ast150-gcc4-glibc-x86_64-pentium4.so">codec_g729-ast150-gcc4-glibc-x86_64-pentium4.so</a></li>
+</ul>
+<br>
+
+<strong>Asterisk 16</strong>
+<ul>
+<li><a href="bin/MD5SUM">MD5SUM</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-athlon-sse.so">codec_g723-ast160-gcc4-glibc-athlon-sse.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-atom.so">codec_g723-ast160-gcc4-glibc-atom.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-barcelona.so">codec_g723-ast160-gcc4-glibc-barcelona.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-core2.so">codec_g723-ast160-gcc4-glibc-core2.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-core2-sse4.so">codec_g723-ast160-gcc4-glibc-core2-sse4.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-debug.so">codec_g723-ast160-gcc4-glibc-debug.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-geode.so">codec_g723-ast160-gcc4-glibc-geode.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-opteron.so">codec_g723-ast160-gcc4-glibc-opteron.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-opteron-sse3.so">codec_g723-ast160-gcc4-glibc-opteron-sse3.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium2.so">codec_g723-ast160-gcc4-glibc-pentium2.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium3-no-sse.so">codec_g723-ast160-gcc4-glibc-pentium3-no-sse.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium3.so">codec_g723-ast160-gcc4-glibc-pentium3.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium4-no-sse.so">codec_g723-ast160-gcc4-glibc-pentium4-no-sse.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium4.so">codec_g723-ast160-gcc4-glibc-pentium4.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium4-sse3.so">codec_g723-ast160-gcc4-glibc-pentium4-sse3.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium-m.so">codec_g723-ast160-gcc4-glibc-pentium-m.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-pentium.so">codec_g723-ast160-gcc4-glibc-pentium.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-barcelona.so">codec_g723-ast160-gcc4-glibc-x86_64-barcelona.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-core2.so">codec_g723-ast160-gcc4-glibc-x86_64-core2.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-core2-sse4.so">codec_g723-ast160-gcc4-glibc-x86_64-core2-sse4.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-opteron.so">codec_g723-ast160-gcc4-glibc-x86_64-opteron.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-opteron-sse3.so">codec_g723-ast160-gcc4-glibc-x86_64-opteron-sse3.so</a></li>
+<li><a href="bin/codec_g723-ast160-gcc4-glibc-x86_64-pentium4.so">codec_g723-ast160-gcc4-glibc-x86_64-pentium4.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-athlon-sse.so">codec_g729-ast160-gcc4-glibc-athlon-sse.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-atom.so">codec_g729-ast160-gcc4-glibc-atom.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-barcelona.so">codec_g729-ast160-gcc4-glibc-barcelona.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-core2.so">codec_g729-ast160-gcc4-glibc-core2.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-core2-sse4.so">codec_g729-ast160-gcc4-glibc-core2-sse4.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-debug.so">codec_g729-ast160-gcc4-glibc-debug.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-geode.so">codec_g729-ast160-gcc4-glibc-geode.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-opteron.so">codec_g729-ast160-gcc4-glibc-opteron.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-opteron-sse3.so">codec_g729-ast160-gcc4-glibc-opteron-sse3.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium2.so">codec_g729-ast160-gcc4-glibc-pentium2.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium3-no-sse.so">codec_g729-ast160-gcc4-glibc-pentium3-no-sse.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium3.so">codec_g729-ast160-gcc4-glibc-pentium3.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium4-no-sse.so">codec_g729-ast160-gcc4-glibc-pentium4-no-sse.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium4.so">codec_g729-ast160-gcc4-glibc-pentium4.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium4-sse3.so">codec_g729-ast160-gcc4-glibc-pentium4-sse3.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium-m.so">codec_g729-ast160-gcc4-glibc-pentium-m.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-pentium.so">codec_g729-ast160-gcc4-glibc-pentium.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-barcelona.so">codec_g729-ast160-gcc4-glibc-x86_64-barcelona.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-core2.so">codec_g729-ast160-gcc4-glibc-x86_64-core2.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so">codec_g729-ast160-gcc4-glibc-x86_64-core2-sse4.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-opteron.so">codec_g729-ast160-gcc4-glibc-x86_64-opteron.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-opteron-sse3.so">codec_g729-ast160-gcc4-glibc-x86_64-opteron-sse3.so</a></li>
+<li><a href="bin/codec_g729-ast160-gcc4-glibc-x86_64-pentium4.so">codec_g729-ast160-gcc4-glibc-x86_64-pentium4.so</a></li>
 </ul>
 <br>
 

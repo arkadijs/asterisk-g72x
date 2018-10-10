@@ -1,8 +1,8 @@
 #!/bin/sh -xe
 
 cp -p ../mkast.sh .
-t=arkadi/asterisk-64bit:15
+t=arkadi/asterisk-64bit:16
 docker build -t $t .
 docker run --rm -v /opt/intel2:/opt/intel2 -v $(pwd)/../..:/opt/asterisk-g72x $t /bin/sh -c 'cd /opt/asterisk-g72x && unsupported/g72x-build.sh'
 rm -f mkast.sh
-ls -l ../../bin/codec_g72*ast150*x86_64*.so
+ls -l ../../bin/codec_g72*ast160*x86_64*.so
