@@ -41,7 +41,7 @@ if test "${prefix}" != "/usr"; then
 fi
 #echo new prefix: "${prefix}"
 
-ASTERISK_VERSION="150";
+ASTERISK_VERSION="160";
 
 AC_ARG_WITH(asterisk-includes,
     AS_HELP_STRING([--with-asterisk-includes=PATH], [Path to Asterisk includes (defaults to PREFIX/include, so try --prefix first)]),
@@ -65,8 +65,11 @@ AC_ARG_WITH(asterisk140,
     AS_HELP_STRING([--with-asterisk140], [Build for Asterisk 14]),
     [ASTERISK_VERSION="140"])
 AC_ARG_WITH(asterisk150,
-    AS_HELP_STRING([--with-asterisk150], [Build for Asterisk 15 (the default)]),
+    AS_HELP_STRING([--with-asterisk150], [Build for Asterisk 15]),
     [ASTERISK_VERSION="150"])
+AC_ARG_WITH(asterisk160,
+    AS_HELP_STRING([--with-asterisk160], [Build for Asterisk 16 (the default)]),
+    [ASTERISK_VERSION="160"])
 
 AC_ARG_WITH(ipp,
     AS_HELP_STRING([--with-ipp=PATH], [Path to Intel IPP (/path/to/ipp)]),

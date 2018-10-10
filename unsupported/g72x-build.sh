@@ -180,7 +180,7 @@ mkdir -p bin/
 
 a=ast150
 ast=/opt/asterisk
-def2=-DG72X_ASTERISK=150
+def2=-DG72X_ASTERISK=160
 codec=g729 dir=$srcdir all &
 codec=g723 dir=$srcdir all &
 

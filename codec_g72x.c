@@ -470,7 +470,11 @@ static void g72x_destroy(struct ast_trans_pvt *pvt)
     ippsFree(state->coder);
     ippsFree(state->scratch_mem);
 #else
+#if G72X_ASTERISK >= 160
+    ast_std_free(state->coder);
+#else
     free(state->coder);
+#endif
 #endif
     /* output the sizes of frames passed to decoder */
     if (option_verbose > 2 && frame_sizes != NULL) {
