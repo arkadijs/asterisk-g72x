@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 BUILD_GCC=1
 #BUILD_ICC=1
@@ -178,9 +178,9 @@ popd
 srcdir=.
 mkdir -p bin/
 
-a=ast160
+a=ast170
 ast=/opt/asterisk
-def2=-DG72X_ASTERISK=160
+def2="-DG72X_ASTERISK=170"
 codec=g729 dir=$srcdir all &
 codec=g723 dir=$srcdir all &
 

@@ -5,7 +5,7 @@ shift
 ./configure --prefix="$b" --localstatedir="$b/var" --sysconfdir="$b/etc" \
     --without-h323 --without-pwlib --disable-xmldoc --without-sdl --with-jansson-bundled "$@" \
   && nice make -j4 \
-  && make install \
+  && make install install-headers \
   && make samples
 
 #--without-curl
