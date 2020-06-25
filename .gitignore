@@ -1,5 +1,3 @@
-syntax: glob
-
 Makefile.in
 aclocal.m4
 compile
