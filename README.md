@@ -2,7 +2,7 @@
 
 [Primary website] / [Google group]
 
-[Asterisk] 1.4, 1.6, 1.8, 10.0 - 17.0 are supported.
+[Asterisk] 1.4, 1.6, 1.8, 10.0 - 18.0 are supported.
 
 To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, download and install [Bcg729] - a slightly slower implementation written in portable C99. Only G.729 will be available in that case.
 
@@ -14,7 +14,7 @@ To install legacy IPP libraries:
 
     tar xf ipp90legacy_lin_9.0.0.008.tar
     cd ipp90legacy_lin/
-    unzip linux.zip 
+    unzip linux.zip
     ... password: accept
     mv linux /opt/intel/ipp/legacy
 
