@@ -26,6 +26,7 @@
 //
 */
 #include <math.h>
+#include <stdlib.h>
 #include "vadg729fp.h"
 #include "owng729fp.h"
 
