@@ -44,7 +44,7 @@ function build()
         $o $opt \
         $src \
         -L"$ipproot"/lib $x86_64libs $ipplibs $icclibs
-    unresolved_sym="$(nm $so | grep ' U ' | grep -v @@GLIBC | grep -Ev ' U (_?_?ast_|cw_|STANDARD_USECOUNT|option_verbose|a?cos|log10|pow|sin|sqrt|fabs|calloc|free|malloc|memcpy|memmove|memset|realloc|nanosleep)')"
+    unresolved_sym="$(nm $so | grep ' U ' | grep -v @@GLIBC | grep -Ev ' U (_?_?ast_|cw_|STANDARD_USECOUNT|option_verbose|option_debug|a?cos|log10|pow|sin|sqrt|fabs|calloc|free|malloc|memcpy|memmove|memset|realloc|nanosleep)')"
     if [ -n "$unresolved_sym" ]; then
         echo -e "$so unresolved symbols\n$unresolved_sym"
         exit 1

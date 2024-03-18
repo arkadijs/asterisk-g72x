@@ -311,8 +311,7 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
     DEBUG_FRAME_SIZE_INC;
 
     if (f->datalen == 0) {  /* Native PLC interpolation */
-        if (option_verbose > 2)
-            ast_verbose(VERBOSE_PREFIX_3 "G.729 PLC\n");
+        ast_debug(5, "G.729 PLC\n");
         if (pvt->samples + G729_SAMPLES > BUFFER_SAMPLES) {
             ast_log(LOG_WARNING, "Out of buffer space\n");
             return -1;
@@ -370,8 +369,7 @@ static int g72xtolin_framein(struct ast_trans_pvt *pvt, struct ast_frame *f)
     DEBUG_FRAME_SIZE_INC;
 
     if (f->datalen == 0) {  /* Native PLC interpolation */
-        if (option_verbose > 2)
-            ast_verbose(VERBOSE_PREFIX_3 "G.723.1 PLC\n");
+        ast_debug(5, "G.723.1 PLC\n");
         if (pvt->samples + G723_SAMPLES > BUFFER_SAMPLES) {
             ast_log(LOG_WARNING, "Out of buffer space\n");
             return -1;
@@ -477,12 +475,12 @@ static void g72x_destroy(struct ast_trans_pvt *pvt)
 #endif
 #endif
     /* output the sizes of frames passed to decoder */
-    if (option_verbose > 2 && frame_sizes != NULL) {
-        ast_verbose(VERBOSE_PREFIX_3 G72X_CODEC " frames\n");
-        ast_verbose(VERBOSE_PREFIX_3 "length: count\n");
+    if (option_debug >= 1 && frame_sizes != NULL) {
+        ast_debug(1, G72X_CODEC " frames\n");
+        ast_debug(1, "length: count\n");
         for (i = 0; i <= DEBUG_MAX_FRAME_SIZE; ++i) {
             if (frame_sizes[i] > 0)
-                ast_verbose(VERBOSE_PREFIX_3 "%6d: %d\n", i, frame_sizes[i]);
+                ast_debug(1, "%6d: %d\n", i, frame_sizes[i]);
         }
     }
 }
@@ -595,11 +593,12 @@ static struct ast_translator lintog72x = {
         ast_free(tmp);
         ast_cli(fd, G72X_CODEC " debug disabled\n");
     } else {
-        frame_sizes = (int*)ast_malloc((DEBUG_MAX_FRAME_SIZE+1)*sizeof(int));
-        if (frame_sizes == NULL)
+        tmp = ast_malloc((DEBUG_MAX_FRAME_SIZE+1)*sizeof(int));
+        if (tmp == NULL)
             return CLI_FAILURE;
-        memset(frame_sizes, 0, (DEBUG_MAX_FRAME_SIZE+1)*sizeof(int));
+        memset(tmp, 0, (DEBUG_MAX_FRAME_SIZE+1)*sizeof(int));
         ast_cli(fd, G72X_CODEC " debug enabled\n");
+        frame_sizes = tmp;
     }
     return CLI_SUCCESS;
 }
