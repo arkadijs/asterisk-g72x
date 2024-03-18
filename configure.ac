@@ -2,13 +2,14 @@
 AC_INIT(codec_g72x, 1.3, http://groups.google.com/group/asterisk-g729)
 saved_cflags="$CFLAGS"
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([Makefile])
 AC_CANONICAL_HOST
 AC_PROG_INSTALL
 AM_INIT_AUTOMAKE
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_DISABLE_STATIC
-AM_PROG_LIBTOOL
+LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
 
 #echo cflags: "${saved_cflags}"
@@ -68,7 +69,7 @@ AC_ARG_WITH(asterisk150,
     AS_HELP_STRING([--with-asterisk150], [Build for Asterisk 15]),
     [ASTERISK_VERSION="150"])
 AC_ARG_WITH(asterisk160,
-    AS_HELP_STRING([--with-asterisk160], [Build for Asterisk 16 (the default)]),
+    AS_HELP_STRING([--with-asterisk160], [Build for Asterisk 16+ (the default)]),
     [ASTERISK_VERSION="160"])
 
 AC_ARG_WITH(ipp,
@@ -408,7 +409,7 @@ AC_SUBST([FLTO_LDFLAGS])
 AC_SUBST([G72X_BCG729])
 AC_SUBST([G72X_9_NOFP])
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT()
 
 echo
 echo "Architecture: $build_cpu"
