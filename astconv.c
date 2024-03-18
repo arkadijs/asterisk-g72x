@@ -4,6 +4,8 @@
 #include <string.h>
 #include <dlfcn.h>
 
+#define AST_MODULE_SELF_SYM __internal_astconv_self
+
 #include <asterisk.h>
 #include <asterisk/module.h>
 #include <asterisk/translate.h>
@@ -88,8 +90,8 @@ int main(int argc, char **argv)
     struct ast_frame f;
     memset(&pvt, 0, sizeof(pvt));
     memset(&f, 0, sizeof(f));
-    pvt.pvt = malloc(coder->desc_size);
-    pvt.outbuf.c = malloc(1600);
+    pvt.pvt = ast_malloc(coder->desc_size);
+    pvt.outbuf.c = ast_malloc(1600);
     if (coder->newpvt(&pvt)) {
         fprintf(stderr, "failed to initialize %s\n", coder->name);
         exit(3);
@@ -107,7 +109,7 @@ int main(int argc, char **argv)
         short slin[frame_size/2];
         int padded = 0, frame_started = 0;
 
-        f.subclass.codec = AST_FORMAT_SLINEAR;
+        /* f.subclass.format = ast_format_slin; */
         f.datalen = sizeof(slin);
         f.samples = sizeof(slin)/2;
         f.data.ptr = slin;
@@ -200,9 +202,9 @@ void ast_module_register(const struct ast_module_info *_mod_info)
 
 int __ast_register_translator(struct ast_translator *t, struct ast_module *module)
 {
-    if (t->srcfmt == AST_FORMAT_SLINEAR)
+    if (!strcmp(t->src_codec.name, "slin"))
         encoder = t;
-    else if (t->dstfmt == AST_FORMAT_SLINEAR)
+    else if (!strcmp(t->dst_codec.name, "slin"))
         decoder = t;
     else {
         fprintf(stderr, "neither source nor destination codec format is SLIN\n");
@@ -212,11 +214,16 @@ int __ast_register_translator(struct ast_translator *t, struct ast_module *modul
 }
 
 /* unused but required to load codec module */
-int option_verbose;
+int option_verbose, option_debug;
 struct ast_flags ast_options;
 void ast_module_unregister(const struct ast_module_info *_mod_info) {}
 void ast_register_file_version(const char *file, const char *version) {}
 void ast_unregister_file_version(const char *file) {}
 /* G.723.1 defaults to 6.3kbps */
 struct ast_config *ast_config_load2(const char *filename, const char *who_asked, struct ast_flags flags) { return NULL; }
-int ast_cli_register(struct ast_cli_entry *e) { return 0; }
+int __ast_cli_register(struct ast_cli_entry *e, struct ast_module *mod) { return 0; }
+struct ast_format *ast_format_slin;
+struct ast_format *ast_format_g729;
+struct ast_format *ast_format_g723;
+#undef malloc
+void *__ast_malloc(size_t size, const char *file, int lineno, const char *func) { return malloc(size); }
