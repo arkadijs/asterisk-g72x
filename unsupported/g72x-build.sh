@@ -5,8 +5,8 @@ BUILD_GCC=1
 file /bin/ls | grep -q 32-bit && BUILD_32=1
 file /bin/ls | grep -q 64-bit && BUILD_64=1
 
-ipproot_prefix53=/opt/intel2/ipp/5.3
-ipproot_prefix=/opt/intel2/ipp/6.1
+ipproot_prefix53=/opt/intel/ipp/5.3
+ipproot_prefix=/opt/intel/ipp/6.1
 
 function build()
 {
@@ -178,9 +178,9 @@ popd
 srcdir=.
 mkdir -p bin/
 
-a=ast190
+a=ast200
 ast=/opt/asterisk
-def2="-DG72X_ASTERISK=190"
+def2="-DG72X_ASTERISK=200"
 codec=g729 dir=$srcdir all &
 codec=g723 dir=$srcdir all &
 

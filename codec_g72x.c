@@ -8,7 +8,7 @@
 #include <time.h>
 
 /* single file implements both G.729 and G.723.1, both IPP and Bcg729 based codecs,
-   Asterisk 1.4 to 14 */
+   Asterisk 1.4 to 20 */
 /* quite a lot of preprocessor abuse, but still better than maintaining multiple
    similar files */
 

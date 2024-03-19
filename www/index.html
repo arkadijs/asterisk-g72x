@@ -31,47 +31,7 @@
 <h3>
 G.729 and G.723.1 codecs for Asterisk open source PBX
 </h3>
-<!--
-<div style="float: right; margin-left: 1em; text-align: center;">
-    <a href="http://support.smiletrain.org/site/Donation2?df_id=1740&1740.donation=form1">
-        <img border="0" alt="Donate to SmileTrain" src="smiletrain-donate-now-btn7.jpg"/>
-    </a>
-    <br>
-    <br>
 
-    <a href="http://wikimediafoundation.org/wiki/Donate/en">
-        <img border="0" alt="Donate to Wikipedia" src="http://upload.wikimedia.org/wikipedia/foundation/3/36/2008_fundraiser_square_button-en.png"/>
-    </a>
-    <br>
-    <br>
-
-    <fieldset>
-        <legend>Support the project</legend>
-
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-            <input type="text" name="amount" value="20" style="width: 3em; text-align: right;">
-            <select name="currency_code">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="JPY">JPY</option>
-                <option value="CAD">CAD</option>
-                <option value="AUD">AUD</option>
-            </select>
-            <br>
-            <input type="image" style="margin-top: 5px;" src="https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif" border="0" name="submit" alt="Donate via PayPal">
-            <input type="hidden" name="cmd" value="_donations">
-            <input type="hidden" name="business" value="FNSEZ2ASPAKJL">
-            <!- -<input type="hidden" name="lc" value="LV">- ->
-            <input type="hidden" name="item_number" value="Donation to help support asterisk.hosting.lv">
-        </form>
-    </fieldset>
-    <br>
-    <small>Or drop some mBTC here:<br>
-        1DZ4mwBAqjWxQuJua<br>
-        UydtG2WaTJfinuc7s</small>
-</div>
--->
 <ul>
     <li><a href="#src">Sources</a></li>
     <li><a href="#bin">Binaries</a></li>
@@ -81,9 +41,9 @@ G.729 and G.723.1 codecs for Asterisk open source PBX
 
 <h4><a name="src">Sources</a></h4>
 To compile the codecs it is recommended to install <a href="https://software.intel.com/en-us/intel-ipp">Intel IPP</a>
-libraries for better performance. Asterisk 1.4 to 18 are supported.
+libraries for better performance. Asterisk 1.4 to 20 are supported.
 <ul>
-    <li><a href="src/asterisk-g72x-1.4.3.tar.bz2">asterisk-g72x-1.4.3.tar.bz2</a> - supports Asterisk 1.4 to 18, <a href="https://github.com/BelledonneCommunications/bcg729">Bcg729</a> 1.0.2</li>
+    <li><a href="src/asterisk-g72x-1.4.4.tar.bz2">asterisk-g72x-1.4.4.tar.bz2</a> - supports Asterisk 1.4 to 20, <a href="https://github.com/BelledonneCommunications/bcg729">Bcg729</a> 1.0.2</li>
     <li><a href="https://bitbucket.org/arkadi/asterisk-g72x/src/master/README.md">README</a></li>
     <li><i>git clone</i> <a href="https://bitbucket.org/arkadi/asterisk-g72x">https://bitbucket.org/arkadi/asterisk-g72x.git</a></li>
     <li><i>git clone</i> <a href="https://github.com/arkadijs/asterisk-g72x">https://github.com/arkadijs/asterisk-g72x.git</a></li>
@@ -114,7 +74,7 @@ sendrate=63
 disallow=all
 allow=g729</pre>
     </li>
-    <li>use "g723 debug" and "g729 debug" commands to print statistics about received frame sizes, can aid in debugging audio problems; you need to bump Asterisk verbosity level to 3 (-vvv) to see the numbers</li>
+    <li>use "g723 debug" and "g729 debug" commands to print statistics about received frame sizes, can aid in debugging audio problems; you need to bump Asterisk debug level to 1 to see the numbers</li>
     <li>for detailed information about Asterisk configuration visit <a href="https://wiki.asterisk.org/wiki/display/AST/Home">Asterisk Wiki</a></li>
     <li>for information about <i>astconv</i> utility read the <a href="https://bitbucket.org/arkadi/asterisk-g72x/src/master/README.md">README</a></li>
     <li>in case of problems read <a href="#notes">Notes and Troubleshooting</a></li>

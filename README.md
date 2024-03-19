@@ -2,11 +2,11 @@
 
 [Primary website] / [Google group]
 
-[Asterisk] 1.4, 1.6, 1.8, 10.0 - 19.0 are supported.
+[Asterisk] 1.4, 1.6, 1.8, 10.0 - 20.x are supported.
 
 To compile the codecs it is recommended to install [Intel IPP] libraries for better performance. Alternatively, download and install [Bcg729] - a slightly slower implementation written in portable C99. Only G.729 will be available in that case.
 
-The codecs are tested against Bcg729 1.0.2, IPP 5.3 - 8.2. Users of IPP 9.0 and IPP 2017 must also install [IPP Legacy] libraries. AMD processors works with IPP too.
+The codecs are tested against Bcg729 1.0.2, IPP 5.3 - 8.2. Users of IPP 9.0 and IPP 2017 must also install [IPP Legacy] libraries. Later IPP versions may not work. AMD processors works with IPP too.
 
 #### IPP
 
@@ -40,9 +40,9 @@ G.723.1 send rate is configured in Asterisk codecs.conf file:
 
 This option is for outgoing voice stream only. It does not affect incoming stream that should be decoded automatically whatever the bit-rate is.
 
-There are also two Asterisk CLI commands `g723 debug` and `g729 debug` to print statistics about received frames sizes. This can aid in debugging audio problems. Bump Asterisk verbosity level to 3 to see the numbers.
+There are also two Asterisk CLI commands `g723 debug` and `g729 debug` to print statistics about received frames sizes. This can aid in debugging audio problems. Bump Asterisk debug level to 1 to see the numbers.
 
-`astconv` is audio format conversion utility similar to Asterisk `file convert` command. Build it with supplied `build-astconv.sh` script against Asterisk 1.8 or later. astconv loads codec_*.so modules directly to perform the conversion. Use codec module that was compiled against same Asterisk version the astconv was built against.
+`astconv` is audio format conversion utility similar to Asterisk `file convert` command. Build it with supplied `build-astconv.sh` script against Asterisk 16 or later. astconv loads codec_*.so modules directly to perform the conversion. Use codec module that was compiled against same Asterisk version the astconv was built against.
 
 The translation result could be used to: (a) confirm the codec is working properly; (b) prepare voice-mail prompts, for example:
 
@@ -53,7 +53,7 @@ The translation result could be used to: (a) confirm the codec is working proper
 
 `file.slin` is signed linear 16-bin 8kHz mono audio, you can play it with alsa-utils:
 
-    aplay -f S16_LE file.slin
+    aplay -f S16_LE -r 8000 file.slin
 
 and convert between other formats with SOX:
 
@@ -73,9 +73,9 @@ Before reporting problem with the codecs, please read the [website] - compiling 
 [Asterisk]: http://www.asterisk.org/
 [Primary website]: http://asterisk.hosting.lv/
 [website]: http://asterisk.hosting.lv/
-[Intel IPP]: https://software.intel.com/en-us/intel-ipp
-[IPP Legacy]: https://software.intel.com/en-us/articles/intel-ipp-legacy-libraries
-[Bcg729]: http://www.linphone.org/eng/documentation/dev/bcg729.html
+[Intel IPP]: https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html
+[IPP Legacy]: https://www.intel.com/content/www/us/en/developer/articles/tool/intel-ipp-legacy-libraries.html
+[Bcg729]: https://github.com/BelledonneCommunications/bcg729
 [GNU Autoconf]: https://www.gnu.org/software/autoconf/
 [Asterisk G.729 Google group]: http://groups.google.com/group/asterisk-g729
 [Google group]: http://groups.google.com/group/asterisk-g729
