@@ -62,7 +62,7 @@ and convert between other formats with SOX:
 
 Files:
 
-- codec_g72x.c, astconv.c, build-astconv.sh - GPLv3;
+- codec_g72x.c, astconv.c, build-astconv.sh - GNU GPL v3;
 - autoconf files initially contributed by Michael.Kromer at computergmbh dot de;
 - g723_slin_ex.h, g729_slin_ex.h, slin_g72x_ex.h - sample speech data;
 - ipp/ files are a copy from IPP samples, IPP license apply.
