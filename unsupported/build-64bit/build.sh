@@ -1,8 +1,8 @@
 #!/bin/sh -xe
 
 cp -p ../mkast.sh .
-t=asterisk-64bit:20
+t=asterisk-64bit:21
 docker build -t $t .
 docker run --rm -v /opt/intel:/opt/intel -v $(pwd)/../..:/opt/asterisk-g72x $t /bin/sh -c 'cd /opt/asterisk-g72x && unsupported/g72x-build.sh'
 rm -f mkast.sh
-ls -l ../../bin/codec_g72*ast200*x86_64*.so
+ls -l ../../bin/codec_g72*ast210*x86_64*.so
