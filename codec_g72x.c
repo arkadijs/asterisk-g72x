@@ -476,7 +476,7 @@ static struct ast_frame *lintog72x_frameout(struct ast_trans_pvt *pvt)
     return ast_trans_frameout(pvt, datalen, samples);
 }
 
-static void g72x_destroy(void)
+static void g72x_print_debug_on_destroy(void)
 {
     int i;
     /* output the sizes of frames passed to decoder */
@@ -499,7 +499,7 @@ static void g72xtolin_destroy(struct ast_trans_pvt *pvt)
 #else
     closeBcg729DecoderChannel(state->coder);
 #endif
-    g72x_destroy();
+    g72x_print_debug_on_destroy();
 }
 
 static void lintog72x_destroy(struct ast_trans_pvt *pvt)
@@ -511,7 +511,7 @@ static void lintog72x_destroy(struct ast_trans_pvt *pvt)
 #else
     closeBcg729EncoderChannel(state->coder);
 #endif
-    g72x_destroy();
+    g72x_print_debug_on_destroy();
 }
 
 static struct ast_translator g72xtolin = {
