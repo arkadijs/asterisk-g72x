@@ -476,20 +476,9 @@ static struct ast_frame *lintog72x_frameout(struct ast_trans_pvt *pvt)
     return ast_trans_frameout(pvt, datalen, samples);
 }
 
-static void g72x_destroy(struct ast_trans_pvt *pvt)
+static void g72x_print_debug_on_destroy(void)
 {
     int i;
-    struct g72x_coder_pvt *state = pvt->pvt;
-#if !G72X_BCG729
-    ippsFree(state->coder);
-    ippsFree(state->scratch_mem);
-#else
-#if G72X_ASTERISK >= 160
-    ast_std_free(state->coder);
-#else
-    free(state->coder);
-#endif
-#endif
     /* output the sizes of frames passed to decoder */
     if (option_debug >= 1 && frame_sizes != NULL) {
         ast_debug(1, G72X_CODEC " frames\n");
@@ -499,6 +488,30 @@ static void g72x_destroy(struct ast_trans_pvt *pvt)
                 ast_debug(1, "%6d: %d\n", i, frame_sizes[i]);
         }
     }
+}
+
+static void g72xtolin_destroy(struct ast_trans_pvt *pvt)
+{
+    struct g72x_coder_pvt *state = pvt->pvt;
+#if !G72X_BCG729
+    ippsFree(state->coder);
+    ippsFree(state->scratch_mem);
+#else
+    closeBcg729DecoderChannel(state->coder);
+#endif
+    g72x_print_debug_on_destroy();
+}
+
+static void lintog72x_destroy(struct ast_trans_pvt *pvt)
+{
+    struct g72x_coder_pvt *state = pvt->pvt;
+#if !G72X_BCG729
+    ippsFree(state->coder);
+    ippsFree(state->scratch_mem);
+#else
+    closeBcg729EncoderChannel(state->coder);
+#endif
+    g72x_print_debug_on_destroy();
 }
 
 static struct ast_translator g72xtolin = {
@@ -515,7 +528,7 @@ static struct ast_translator g72xtolin = {
 #endif
     .newpvt = g72xtolin_new,
     .framein = g72xtolin_framein,
-    .destroy = g72x_destroy,
+    .destroy = g72xtolin_destroy,
     .sample = g72xtolin_sample,
 #if G72X_CALLWEAVER
     .src_rate = 8000,
@@ -542,7 +555,7 @@ static struct ast_translator lintog72x = {
     .newpvt = lintog72x_new,
     .framein = lintog72x_framein,
     .frameout = lintog72x_frameout,
-    .destroy = g72x_destroy,
+    .destroy = lintog72x_destroy,
     .sample = lintog72x_sample,
 #if G72X_CALLWEAVER
     .src_rate = 8000,
