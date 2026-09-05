@@ -98,7 +98,21 @@ AC_ARG_WITH(g729nofp,
 
 AC_ARG_WITH(bcg729,
     AS_HELP_STRING([--with-bcg729], [Build against Bcg729 library; without G.723.1]),
-    [G72X_BCG729="-DG72X_BCG729"; CPPFLAGS="$CPPFLAGS -I/usr/local/include"; LDFLAGS="$LDFLAGS -L/usr/local/lib"])
+    [G72X_BCG729="-DG72X_BCG729"])
+
+# Bcg729 installs libbcg729.pc, and its CMake build puts the library under
+# ${prefix}/lib/<arch-triplet> on multiarch systems, which the hardcoded
+# /usr/local paths do not cover. Prefer pkg-config, fall back to /usr/local.
+if test -n "$G72X_BCG729"; then
+    m4_ifdef([PKG_CHECK_MODULES], [
+        PKG_CHECK_MODULES([BCG729], [libbcg729],
+            [CPPFLAGS="$CPPFLAGS $BCG729_CFLAGS"; LIBS="$BCG729_LIBS $LIBS"; bcg729_pkgconfig=yes],
+            [AC_MSG_NOTICE([libbcg729.pc not found, falling back to /usr/local])])
+    ])
+    if test "$bcg729_pkgconfig" != "yes"; then
+        CPPFLAGS="$CPPFLAGS -I/usr/local/include"; LDFLAGS="$LDFLAGS -L/usr/local/lib"
+    fi
+fi
 
 # http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-understanding-cpu-optimized-code-used-in-intel-ipp/
 # http://software.intel.com/sites/products/documentation/doclib/ipp_sa/71/ipp_userguide_lnx/GUID-BABCDBB5-E674-4ECF-AE3A-4945274FDA80.htm
